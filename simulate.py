@@ -14,7 +14,7 @@ robotId = p.loadURDF("body.urdf")
 p.loadSDF("world.sdf")
 
 for i in range(0, 1000):
-    time.sleep(1/200)
+    time.sleep(1/20)
     p.stepSimulation()
 
     print(i)
