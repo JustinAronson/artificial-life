@@ -1,7 +1,7 @@
 import pybullet as p
 import time
 import pybullet_data
-import generate
+#import generate
 import pyrosim.pyrosim as pyrosim
 import numpy
 import random
