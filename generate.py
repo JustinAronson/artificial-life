@@ -21,7 +21,10 @@ def Create_World():
 
 Create_World()
 
-def Create_Robot():
+#def Create_Robot():
+
+
+def Generate_Body():
     pyrosim.Start_URDF("body.urdf")
 
     pyrosim.Send_Cube(name="Torso", pos=[1.5, 0, 1.5], size=[length, width, height])
@@ -34,4 +37,13 @@ def Create_Robot():
 
     pyrosim.End()
 
-Create_Robot()
+def Generate_Brain():
+    pyrosim.Start_NeuralNetwork("brain.nndf")
+
+    pyrosim.Send_Sensor_Neuron(name = 0 , linkName = "Torso")
+
+    pyrosim.End()
+
+#Create_Robot()
+Generate_Body()
+Generate_Brain()
