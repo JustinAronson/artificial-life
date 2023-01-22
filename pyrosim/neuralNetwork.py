@@ -29,7 +29,10 @@ class NEURAL_NETWORK:
         print("")
 
     def Update(self):
-        pass
+        for neuron in self.neurons:
+            if self.neurons[neuron].Is_Sensor_Neuron():
+                self.neurons[neuron].Update_Sensor_Neuron()
+
 
 # ---------------- Private methods --------------------------------------
 
