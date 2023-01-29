@@ -55,7 +55,11 @@ class PARALLEL_HILL_CLIMBER:
             print("")
 
     def Show_Best(self):
-        pass # self.parent.Evaluate("GUI")
+        lowestFitnessParent = self.parents[0]
+        for id in self.parents:
+            if self.parents[id].fitness < lowestFitnessParent.fitness:
+                lowestFitnessParent = self.parents[id]
+        lowestFitnessParent.Start_Simulation("GUI")
 
     def Evaluate(self, solutions):
         for id in solutions:
