@@ -9,7 +9,8 @@ import constants as c
 class SIMULATION:
 
     def __init__(self, directOrGUI):
-        if directOrGUI == "DIRECT":
+        self.directOrGUI = directOrGUI
+        if self.directOrGUI == "DIRECT":
             self.physicsClient = p.connect(p.DIRECT)
         else:
             self.physicsClient = p.connect(p.GUI)
@@ -28,7 +29,8 @@ class SIMULATION:
 
     def Run(self):
         for t in range(0, c.loopIterations):
-            time.sleep(1/2400)
+            if self.directOrGUI == "GUI":
+                time.sleep(1/2400)
             p.stepSimulation()
 
             self.robot.Sense(t)
