@@ -8,3 +8,5 @@ frequencyFront = 6
 phaseOffsetFront = numpy.pi/4
 
 loopIterations = 400
+
+numberOfGenerations = 50

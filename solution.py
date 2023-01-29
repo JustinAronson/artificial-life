@@ -2,6 +2,7 @@ import pybullet as p
 import numpy as np
 import pyrosim.pyrosim as pyrosim
 import random
+import os
 
 class SOLUTION:
 
@@ -9,11 +10,30 @@ class SOLUTION:
         self.weights = np.random.rand(3, 2)
         self.weights = self.weights * 2 - 1
 
-    def Evaluate(self):
-        pass
+    def Evaluate(self, directOrGUI):
+        self.Create_World()
+        self.Create_Body()
+        self.Create_Brain()
+        os.system("python3 simulate.py " + directOrGUI)
+        f = open("fitness.txt", "r")
+        self.fitness = float(f.read())
+        f.close()
 
+    def Mutate(self):
+        row = random.randint(0, 2)
+        column = random.randint(0, 1)
+
+        self.weights[row, column] = random.random() * 2 - 1
 
     def Create_World(self):
+
+        length = 1
+        width = 1
+        height = 1
+
+        x = 0
+        y = 0
+        z = height/2
 
         pyrosim.Start_SDF("world.sdf")
 
@@ -26,6 +46,14 @@ class SOLUTION:
 
 
     def Create_Body(self):
+        length = 1
+        width = 1
+        height = 1
+
+        x = 0
+        y = 0
+        z = height/2
+        
         pyrosim.Start_URDF("body.urdf")
 
         pyrosim.Send_Cube(name="Torso", pos=[1.5, 0, 1.75], size=[length, width, height])
@@ -50,15 +78,15 @@ class SOLUTION:
         pyrosim.Send_Motor_Neuron( name = 3 , jointName = "Torso_BackLeg")
         pyrosim.Send_Motor_Neuron( name = 4 , jointName = "Torso_FrontLeg")
 
-        motors = [3, 4]
+        motors = [0, 1]
 
         # pyrosim.Send_Synapse( sourceNeuronName = 0 , targetNeuronName = 3 , weight = -1.0 )
         # pyrosim.Send_Synapse( sourceNeuronName = 1 , targetNeuronName = 3 , weight = -1.0 )
         # pyrosim.Send_Synapse( sourceNeuronName = 2 , targetNeuronName = 4 , weight = 1.0 )
 
-        for sensorName in sensors:
-            for motorName in motors:
-                    pyrosim.Send_Synapse( sourceNeuronName = sensorName , targetNeuronName = motorName , weight = random.uniform(-1, 1) )
+        for currentRow in sensors:
+            for currentColumn in motors:
+                    pyrosim.Send_Synapse( sourceNeuronName = currentRow , targetNeuronName = currentColumn + 3 , weight = self.weights[currentRow][currentColumn] )
 
 
         pyrosim.End()
