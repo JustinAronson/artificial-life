@@ -13,9 +13,10 @@ class SOLUTION:
         self.myID = nextAvailableID
 
     def Evaluate(self, directOrGUI):
-        self.Create_World()
-        self.Create_Body()
-        self.Create_Brain()
+        pass
+        # self.Create_World()
+        # self.Create_Body()
+        # self.Create_Brain()
         # os.system("python3 simulate.py " + directOrGUI + " " + str(self.myID) + " &")
         # while not os.path.exists("fitness" + str(self.myID) + ".txt"):
         #     time.sleep(0.01)
@@ -24,14 +25,18 @@ class SOLUTION:
         # f.close()
 
     def Start_Simulation(self, directOrGUI):
+        self.Create_World()
+        self.Create_Body()
+        self.Create_Brain()
         os.system("python3 simulate.py " + directOrGUI + " " + str(self.myID) + " &")
 
-    def Wait_For_Simulation_To_End():
+    def Wait_For_Simulation_To_End(self):
         while not os.path.exists("fitness" + str(self.myID) + ".txt"):
             time.sleep(0.01)
         f = open("fitness" + str(self.myID) + ".txt", "r")
         self.fitness = float(f.read())
-        f.close()        
+        f.close()
+        os.system("rm fitness" + str(self.myID) + ".txt")        
 
     def Mutate(self):
         row = random.randint(0, 2)
