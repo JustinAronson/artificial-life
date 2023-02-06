@@ -9,5 +9,5 @@ phaseOffsetFront = numpy.pi/4
 
 loopIterations = 400
 
-numberOfGenerations = 2
+numberOfGenerations = 10
 populationSize = 10
