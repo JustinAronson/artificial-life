@@ -1,10 +1,10 @@
 pybullet build time: Jan  9 2023 15:21:07
 b3Warning[examples/Importers/ImportURDFDemo/BulletUrdfImporter.cpp,126]:
 expected a world element, continuing without it.Traceback (most recent call last):
-  File "/Users/justin/Documents/CS Classes/artificial-life/simulate.py", line 21, in <module>
-    simulation.Run()
-  File "/Users/justin/Documents/CS Classes/artificial-life/simulation.py", line 39, in Run
-    self.robot.Get_Positions(self.world)
-  File "/Users/justin/Documents/CS Classes/artificial-life/robot.py", line 80, in Get_Positions
-    xDistance = basePosition[0] - topPos[0]
-TypeError: unsupported operand type(s) for -: 'float' and 'tuple'
+  File "/Users/justin/Documents/CS Classes/artificial-life/simulate.py", line 22, in <module>
+    simulation.Get_Fitness()
+  File "/Users/justin/Documents/CS Classes/artificial-life/simulation.py", line 42, in Get_Fitness
+    self.robot.Get_Fitness()
+  File "/Users/justin/Documents/CS Classes/artificial-life/robot.py", line 68, in Get_Fitness
+    f.write("%s\n%s" % (str(self.robotPositionDifference)), str(self.boxPositionDifference))
+TypeError: not enough arguments for format string

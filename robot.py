@@ -73,7 +73,9 @@ class ROBOT:
 
     def Get_Positions(self, world):
         bottomPos = world.Get_Link_Positions(0)
+        bottomPos = bottomPos[0]
         topPos = world.Get_Link_Positions(1)
+        topPos = topPos[0]
         basePositionAndOrientation = p.getBasePositionAndOrientation(self.robot)
         basePosition = basePositionAndOrientation[0]
 
