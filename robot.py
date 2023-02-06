@@ -51,8 +51,8 @@ class ROBOT:
         positionOfLinkZero = stateOfLinkZero[0]
         xCoordinateOfLinkZero = positionOfLinkZero[0]
         f = open("tmp" + str(self.solutionID) + ".txt", "w")
-        f.write(str(xCoordinateOfLinkZero)) 
-        # f.write(str(self.robotPositionDifference))
+        # f.write(str(xCoordinateOfLinkZero)) 
+        f.write(str(self.robotPositionDifference))
         f.close()
 
         os.system("mv tmp" + str(self.solutionID) + ".txt fitness" + str(self.solutionID) + ".txt")
@@ -78,4 +78,5 @@ class ROBOT:
 
         if boxPositionDifference < self.boxPositionDifference:
             self.boxPositionDifference = boxPositionDifference
+
         pass
