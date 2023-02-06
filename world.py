@@ -4,4 +4,8 @@ class WORLD:
 
     def __init__(self):
         self.planeId = p.loadURDF("plane.urdf")
-        p.loadSDF("world.sdf")
+        self.objects = p.loadSDF("world.sdf")
+
+    def Get_Link_Positions(self, index):
+        print("In get link positions")
+        return p.getBasePositionAndOrientation(self.objects[index])

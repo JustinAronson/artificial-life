@@ -16,5 +16,7 @@ solutionID = sys.argv[2]
 
 simulation = SIMULATION(directOrGUI, solutionID)
 
+print("Going into Sim Run")
 simulation.Run()
+print("Out Sim Run")
 simulation.Get_Fitness()

@@ -17,6 +17,8 @@ class ROBOT:
         self.nn = NEURAL_NETWORK("brain" + solutionID + ".nndf")
         os.system("rm brain" + str(solutionID) + ".nndf")
         self.solutionID = solutionID
+        self.robotPositionDifference = 200
+        self.boxPositionDifference = 200
 
     def Prepare_To_Sense(self):
         self.sensors = {}
@@ -49,7 +51,31 @@ class ROBOT:
         positionOfLinkZero = stateOfLinkZero[0]
         xCoordinateOfLinkZero = positionOfLinkZero[0]
         f = open("tmp" + str(self.solutionID) + ".txt", "w")
-        f.write(str(xCoordinateOfLinkZero))
+        f.write(str(xCoordinateOfLinkZero)) 
+        # f.write(str(self.robotPositionDifference))
         f.close()
 
         os.system("mv tmp" + str(self.solutionID) + ".txt fitness" + str(self.solutionID) + ".txt")
+
+    def Find_Fitness(self, bottomBoxPos, topBoxPos):
+        basePositionAndOrientation = p.getBasePositionAndOrientation(self.robot)
+        basePosition = basePositionAndOrientation[0]
+
+        bottomPos = bottomBoxPos[0]
+        topPos = topBoxPos[0]
+        xDistance = basePosition[0] - topPos[0]
+        yDistance = basePosition[1] - topPos[1]
+        zDistance = basePosition[2] - topPos[2]
+        robotPositionDifference = (xDistance**2 + yDistance**2 + zDistance**2)**0.5
+
+        if robotPositionDifference < self.robotPositionDifference:
+            self.robotPositionDifference = robotPositionDifference
+
+        xDistance = bottomPos[0] - topPos[0]
+        yDistance = bottomPos[1] - topPos[1]
+        zDistance = bottomPos[2] + 1 - topPos[2]
+        boxPositionDifference = (xDistance**2 + yDistance**2 + zDistance**2)**0.5
+
+        if boxPositionDifference < self.boxPositionDifference:
+            self.boxPositionDifference = boxPositionDifference
+        pass

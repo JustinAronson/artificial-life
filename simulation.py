@@ -37,5 +37,10 @@ class SIMULATION:
             self.robot.Think()
             self.robot.Act(t)
 
+            bottomBoxPos = self.world.Get_Link_Positions(0)
+            topBoxPos = self.world.Get_Link_Positions(0)
+
+            self.robot.Find_Fitness(bottomBoxPos, topBoxPos)
+
     def Get_Fitness(self):
         self.robot.Get_Fitness()
