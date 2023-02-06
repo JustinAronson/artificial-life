@@ -54,16 +54,16 @@ class SOLUTION:
         width = 1
         height = 1
 
-        x = 0
-        y = 0
+        x = 2
+        y = 2
         z = height/2
 
         pyrosim.Start_SDF("world.sdf")
 
-        x = -2
-        y = -2
+        pyrosim.Send_Cube(name="Box1", pos=[x, y, z], size=[length, width, height])
 
-        # pyrosim.Send_Cube(name="Box", pos=[x, y, z], size=[length, width, height])
+        x = -2
+        pyrosim.Send_Cube(name="Box2", pos=[x, y, z], size=[length, width, height])
 
         pyrosim.End()
 
