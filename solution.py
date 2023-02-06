@@ -34,9 +34,10 @@ class SOLUTION:
     def Wait_For_Simulation_To_End(self):
         while not os.path.exists("fitness" + str(self.myID) + ".txt"):
             time.sleep(0.01)
-        f = open("fitness" + str(self.myID) + ".txt", "r")
-        self.fitness = float(f.read())
-        f.close()
+        with open("fitness" + str(self.myID) + ".txt", "r") as f:
+            #self.fitness[0] = pos difference between robot and top box
+            #self.fitness[1] = pos difference between top box and the top of bottom box
+            self.fitness = f.readlines()
         os.system("rm fitness" + str(self.myID) + ".txt")        
 
     def Mutate(self):
@@ -54,16 +55,16 @@ class SOLUTION:
         width = 1
         height = 1
 
-        x = 0
-        y = 0
+        x = 2
+        y = 2
         z = height/2
 
         pyrosim.Start_SDF("world.sdf")
 
-        x = -2
-        y = -2
+        pyrosim.Send_Cube(name="Box1", pos=[x, y, z], size=[length, width, height])
 
-        # pyrosim.Send_Cube(name="Box", pos=[x, y, z], size=[length, width, height])
+        x = -2
+        pyrosim.Send_Cube(name="Box2", pos=[x, y, z], size=[length, width, height])
 
         pyrosim.End()
 

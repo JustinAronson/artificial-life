@@ -47,9 +47,23 @@ class ROBOT:
     def Get_Fitness(self):
         basePositionAndOrientation = p.getBasePositionAndOrientation(self.robot)
         basePosition = basePositionAndOrientation[0]
-        xPosition = basePosition[0]
+        # xPosition = basePosition[0]
+        # yPosition = basePosition[1]
+        xDistance = basePosition[0] - topPos[0]
+        yDistance = basePosition[1] - topPos[1]
+        zDistance = basePosition[2] - topPos[2]
+        robotPositionDifference = (xDistance**2 + yDistance**2 + zDistance**2)**0.5
+
+        bottomPos = p.getBasePositionAndOrientation(self.objects[0])
+        topPos = p.getBasePositionAndOrientation(self.objects[1])
+        xDistance = bottomPos[0] - topPos[0]
+        yDistance = bottomPos[1] - topPos[1]
+        zDistance = bottomPos[2] + 1 - topPos[2]
+        boxPositionDifference = (xDistance**2 + yDistance**2 + zDistance**2)**0.5
+
         f = open("tmp" + str(self.solutionID) + ".txt", "w")
-        f.write(str(xPosition))
+        f.write(str(robotPositionDifference))
+        f.write(str(boxPositionDifference))
         f.close()
 
         os.system("mv tmp" + str(self.solutionID) + ".txt fitness" + str(self.solutionID) + ".txt")
