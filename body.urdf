@@ -21,7 +21,7 @@
             </geometry>
         </collision>
     </link>
-    <joint name="Torso_LeftLeg" type="revolute">
+    <joint name="Torso_LeftLeg" type="fixed">
        <parent link="Torso"/>
        <child  link="LeftLeg"/>
        <origin rpy="0 0 0" xyz="-0.5 0 0.9" />
@@ -50,7 +50,7 @@
             </geometry>
         </collision>
     </link>
-    <joint name="LeftLeg_LeftLowerLeg" type="revolute">
+    <joint name="LeftLeg_LeftLowerLeg" type="fixed">
        <parent link="LeftLeg"/>
        <child  link="LeftLowerLeg"/>
        <origin rpy="0 0 0" xyz="0 -1 0" />
@@ -79,7 +79,7 @@
             </geometry>
         </collision>
     </link>
-    <joint name="LeftLowerLeg_LeftRoller" type="revolute">
+    <joint name="LeftLowerLeg_LeftRoller" type="spherical">
        <parent link="LeftLowerLeg"/>
        <child  link="LeftRoller"/>
        <origin rpy="0 0 0" xyz="0.1 0 -0.9" />
@@ -108,7 +108,7 @@
             </geometry>
         </collision>
     </link>
-    <joint name="Torso_RightLeg" type="revolute">
+    <joint name="Torso_RightLeg" type="fixed">
        <parent link="Torso"/>
        <child  link="RightLeg"/>
        <origin rpy="0 0 0" xyz="0.5 0 0.9" />
@@ -137,7 +137,7 @@
             </geometry>
         </collision>
     </link>
-    <joint name="RightLeg_RightLowerLeg" type="revolute">
+    <joint name="RightLeg_RightLowerLeg" type="fixed">
        <parent link="RightLeg"/>
        <child  link="RightLowerLeg"/>
        <origin rpy="0 0 0" xyz="0 1 0" />
@@ -166,7 +166,7 @@
             </geometry>
         </collision>
     </link>
-    <joint name="RightLowerLeg_RightRoller" type="revolute">
+    <joint name="RightLowerLeg_RightRoller" type="spherical">
        <parent link="RightLowerLeg"/>
        <child  link="RightRoller"/>
        <origin rpy="0 0 0" xyz="-0.1 0 -0.9" />
