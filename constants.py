@@ -9,10 +9,11 @@ phaseOffsetFront = numpy.pi/4
 
 loopIterations = 1200
 
-numberOfGenerations = 15
-populationSize = 25
+numberOfGenerations = 1
+populationSize = 1
 
 numSensorNeurons = 4
 numMotorNeurons = 8
+numHiddenNeurons = 4
 
 motorJointRange = 0.2
