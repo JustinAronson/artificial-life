@@ -12,7 +12,7 @@ loopIterations = 1200
 numberOfGenerations = 1
 populationSize = 1
 
-numSensorNeurons = 6
-numMotorNeurons = 8
+numSensorNeurons = 4
+numMotorNeurons = 6
 
-motorJointRange = 1
+motorJointRange = 0.2
