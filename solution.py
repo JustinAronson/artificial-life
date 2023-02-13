@@ -44,11 +44,11 @@ class SOLUTION:
 
     def Mutate(self):
         row = random.randint(0, c.numHiddenNeurons - 1)
-        column = random.randint(0, c.numSensorNeurons - 1)
+        column = random.randint(0, len(self.sensorIDs) - 1)
 
         self.weights[0][row, column] = random.random() * 2 - 1
 
-        column = random.randint(0, c.numMotorNeurons - 1)
+        column = random.randint(0, self.numLinks - 1)
         self.weights[1][row, column] = random.random() * 2 - 1
 
     def Set_ID(self, nextAvailableID):
