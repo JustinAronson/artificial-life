@@ -96,15 +96,18 @@ class SOLUTION:
             pos = size
             # size = random.sample(range(0.1, 2), 3)
             size = [x / 10 for x in random.sample(range(1, 20), 3)]
-            if id == 1:
-                print(size)
-            
-            self.Create_Random_Link(id, pos, size, id == numLinks-1)
+
+            if random.random() < 0.5:
+                self.sensorIDs.append(id)
+                self.Create_Random_Link(id, pos, size, id == numLinks-1, 'green')
+            else:
+                self.Create_Random_Link(id, pos, size, id == numLinks-1, 'blue')                
 
         pyrosim.End()
+        exit()
 
-    def Create_Random_Link(self, id, pos, size, endFlag):
-        pyrosim.Send_Cube(name=str(id), pos=pos, size=size)
+    def Create_Random_Link(self, id, pos, size, endFlag, colorName):
+        pyrosim.Send_Cube(name=str(id), pos=pos, size=size, colorName = colorName)
         if id == 0:
             pyrosim.Send_Joint(name = str(id) + "_" + str(id+1) , parent= str(id) , child = str(id+1) , type = "revolute", position = [size[0], size[1], size[2] + 1], jointAxis = "1 0 0")
         elif not endFlag:

@@ -1,14 +1,21 @@
 from pyrosim.commonFunctions import Save_Whitespace
 
+from matplotlib import colors
+
 class MATERIAL: 
 
-    def __init__(self):
+    def __init__(self, colorName = 'cyan'):
 
         self.depth  = 3
 
-        self.string1 = '<material name="Cyan">'
+        self.string1 = '<material name="' + colorName + '">'
 
-        self.string2 = '    <color rgba="0 1.0 1.0 1.0"/>'
+        if colorName == 'blue':
+            self.string2 = '    <color rgba="0 0.0 1.0 1.0"/>'
+        elif colorName == 'green':
+            self.string2 = '    <color rgba="0 0.0 1.0 0.0"/>'
+        else:
+            self.string2 = '    <color rgba="0 1.0 1.0 1.0"/>'
 
         self.string3 = '</material>'
 
