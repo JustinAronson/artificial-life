@@ -9,12 +9,10 @@ import constants as c
 class SOLUTION:
 
     def __init__(self, nextAvailableID):
-        self.weights = [np.random.rand(c.numHiddenNeurons, c.numSensorNeurons), np.random.rand(c.numHiddenNeurons, c.numMotorNeurons)]
-        self.weights[0] = self.weights[0] * 2 - 1
-        self.weights[1] = self.weights[1] * 2 - 1
         self.myID = nextAvailableID
         self.sensorIDs = []
-        self.numLinks = random.randint(1, 10)
+        self.numLinks = random.randint(2, 4)
+        self.weights = []
 
     def Evaluate(self, directOrGUI):
         pass
@@ -43,13 +41,16 @@ class SOLUTION:
         os.system("rm fitness" + str(self.myID) + ".txt")        
 
     def Mutate(self):
-        row = random.randint(0, c.numHiddenNeurons - 1)
-        column = random.randint(0, len(self.sensorIDs) - 1)
+        print("Sensors: ")
+        print(self.sensorIDs)
 
-        self.weights[0][row, column] = random.random() * 2 - 1
+        row = random.randint(0, c.numHiddenNeurons - 1)
+        column = self.sensorIDs.index(random.choice(self.sensorIDs))
+
+        self.weights[0][row][column] = random.random() * 2 - 1
 
         column = random.randint(0, self.numLinks - 1)
-        self.weights[1][row, column] = random.random() * 2 - 1
+        self.weights[1][row][column] = random.random() * 2 - 1
 
     def Set_ID(self, nextAvailableID):
         self.myID = nextAvailableID
@@ -86,7 +87,6 @@ class SOLUTION:
         
         # Starting size will be reset, this is for position of the robot
         size = [0, 0, 1]
-        print(size)
 
         pyrosim.Start_URDF("body.urdf")
 
@@ -96,7 +96,10 @@ class SOLUTION:
             # size = random.sample(range(0.1, 2), 3)
             size = [x / 10 for x in random.sample(range(1, 20), 3)]
 
-            if random.random() < 0.5:
+            print(size)
+
+            # Make a link a sensor 50% of the time. If no links are sensor links, make the last link a sensor
+            if (random.random() < 0.5) or (id == self.numLinks-1 and len(self.sensorIDs) == 0):
                 self.sensorIDs.append(id)
                 self.Create_Random_Link(id, pos, size, id == self.numLinks-1, 'green')
             else:
@@ -124,7 +127,8 @@ class SOLUTION:
 
         for id in range(0, self.numLinks):
             if id in self.sensorIDs:
-                pyrosim.Send_Sensor_Neuron(name = id + self.numLinks + numHiddenNeurons , linkName = str(id))
+                # Number of motor joints = self.numLinks-1, ids start at 0
+                pyrosim.Send_Sensor_Neuron(name = self.sensorIDs.index(id) + (self.numLinks-1) + numHiddenNeurons , linkName = str(id))
             if not id == self.numLinks - 1:
                 pyrosim.Send_Motor_Neuron( name = id , jointName = str(id) + "_" + str(id + 1))
 
@@ -144,20 +148,24 @@ class SOLUTION:
         # pyrosim.Send_Hidden_Neuron(name = 15)
 
         for hiddenNeuronID in range(0, numHiddenNeurons):
-            pyrosim.Send_Hidden_Neuron(name = self.numLinks + hiddenNeuronID)
+            pyrosim.Send_Hidden_Neuron(name = self.numLinks-1 + hiddenNeuronID)
 
 
         # pyrosim.Send_Synapse( sourceNeuronName = 0 , targetNeuronName = 3 , weight = -1.0 )
         # pyrosim.Send_Synapse( sourceNeuronName = 1 , targetNeuronName = 3 , weight = -1.0 )
         # pyrosim.Send_Synapse( sourceNeuronName = 2 , targetNeuronName = 4 , weight = 1.0 )
 
-        for currentRow in range(0, numHiddenNeurons):
-            for currentColumn in range(0, len(self.sensorIDs)):
-                    pyrosim.Send_Synapse( sourceNeuronName = currentColumn + self.numLinks + numHiddenNeurons , targetNeuronName = currentRow + self.numLinks , weight = self.weights[0][currentRow][currentColumn] )
+        self.weights = [np.random.rand(numHiddenNeurons, len(self.sensorIDs)), np.random.rand(numHiddenNeurons, self.numLinks)]
+        self.weights[0] = self.weights[0] * 2 - 1
+        self.weights[1] = self.weights[1] * 2 - 1
 
         for currentRow in range(0, numHiddenNeurons):
-            for currentColumn in range(0, self.numLinks):
-                    pyrosim.Send_Synapse( sourceNeuronName = currentRow + self.numLinks , targetNeuronName = currentColumn , weight = self.weights[1][currentRow][currentColumn] )
+            for currentColumn in range(0, len(self.sensorIDs)):
+                    pyrosim.Send_Synapse( sourceNeuronName = currentColumn + self.numLinks - 1 + numHiddenNeurons , targetNeuronName = currentRow + self.numLinks - 1 , weight = self.weights[0][currentRow][currentColumn] )
+
+        for currentRow in range(0, numHiddenNeurons):
+            for currentColumn in range(0, self.numLinks-1):
+                    pyrosim.Send_Synapse( sourceNeuronName = currentRow + self.numLinks - 1 , targetNeuronName = currentColumn , weight = self.weights[1][currentRow][currentColumn] )
 
 
         pyrosim.End()
