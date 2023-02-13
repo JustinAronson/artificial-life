@@ -14,6 +14,7 @@ class SOLUTION:
         self.weights[1] = self.weights[1] * 2 - 1
         self.myID = nextAvailableID
         self.sensorIDs = []
+        self.numLinks = random.randint(1, 10)
 
     def Evaluate(self, directOrGUI):
         pass
@@ -87,24 +88,21 @@ class SOLUTION:
         size = [0, 0, 1]
         print(size)
 
-        numLinks = random.randint(1, 10)
-
         pyrosim.Start_URDF("body.urdf")
 
         # pyrosim.Send_Cube(name = "0", pos = [0, 0, 1], size = size)
-        for id in range(0, numLinks):
+        for id in range(0, self.numLinks):
             pos = size
             # size = random.sample(range(0.1, 2), 3)
             size = [x / 10 for x in random.sample(range(1, 20), 3)]
 
             if random.random() < 0.5:
                 self.sensorIDs.append(id)
-                self.Create_Random_Link(id, pos, size, id == numLinks-1, 'green')
+                self.Create_Random_Link(id, pos, size, id == self.numLinks-1, 'green')
             else:
-                self.Create_Random_Link(id, pos, size, id == numLinks-1, 'blue')                
+                self.Create_Random_Link(id, pos, size, id == self.numLinks-1, 'blue')                
 
         pyrosim.End()
-        exit()
 
     def Create_Random_Link(self, id, pos, size, endFlag, colorName):
         pyrosim.Send_Cube(name=str(id), pos=pos, size=size, colorName = colorName)
@@ -116,38 +114,50 @@ class SOLUTION:
     def Create_Brain(self):
         pyrosim.Start_NeuralNetwork("brain" + str(self.myID) + ".nndf")
 
-        pyrosim.Send_Sensor_Neuron(name = 0 , linkName = "BackLowerLeg")
-        pyrosim.Send_Sensor_Neuron(name = 1 , linkName = "FrontLowerLeg")
-        pyrosim.Send_Sensor_Neuron(name = 2 , linkName = "LeftLowerLeg")
-        pyrosim.Send_Sensor_Neuron(name = 3 , linkName = "RightLowerLeg")        
+        # pyrosim.Send_Sensor_Neuron(name = 0 , linkName = "BackLowerLeg")
+        # pyrosim.Send_Sensor_Neuron(name = 1 , linkName = "FrontLowerLeg")
+        # pyrosim.Send_Sensor_Neuron(name = 2 , linkName = "LeftLowerLeg")
+        # pyrosim.Send_Sensor_Neuron(name = 3 , linkName = "RightLowerLeg")
+        
+        # Could also be replaced with a random number of hidden neurons
+        numHiddenNeurons = c.numHiddenNeurons
+
+        for id in range(0, self.numLinks):
+            if id in self.sensorIDs:
+                pyrosim.Send_Sensor_Neuron(name = id + self.numLinks + numHiddenNeurons , linkName = str(id))
+            if not id == self.numLinks - 1:
+                pyrosim.Send_Motor_Neuron( name = id , jointName = str(id) + "_" + str(id + 1))
 
 
-        pyrosim.Send_Motor_Neuron( name = 4 , jointName = "Torso_BackLeg")
-        pyrosim.Send_Motor_Neuron( name = 5 , jointName = "Torso_FrontLeg")
-        pyrosim.Send_Motor_Neuron( name = 6 , jointName = "Torso_LeftLeg")
-        pyrosim.Send_Motor_Neuron( name = 7 , jointName = "Torso_RightLeg")
-        pyrosim.Send_Motor_Neuron( name = 8 , jointName = "BackLeg_BackLowerLeg")
-        pyrosim.Send_Motor_Neuron( name = 9 , jointName = "FrontLeg_FrontLowerLeg")
-        pyrosim.Send_Motor_Neuron( name = 10 , jointName = "LeftLeg_LeftLowerLeg")
-        pyrosim.Send_Motor_Neuron( name = 11 , jointName = "RightLeg_RightLowerLeg")
+        # pyrosim.Send_Motor_Neuron( name = 4 , jointName = "Torso_BackLeg")
+        # pyrosim.Send_Motor_Neuron( name = 5 , jointName = "Torso_FrontLeg")
+        # pyrosim.Send_Motor_Neuron( name = 6 , jointName = "Torso_LeftLeg")
+        # pyrosim.Send_Motor_Neuron( name = 7 , jointName = "Torso_RightLeg")
+        # pyrosim.Send_Motor_Neuron( name = 8 , jointName = "BackLeg_BackLowerLeg")
+        # pyrosim.Send_Motor_Neuron( name = 9 , jointName = "FrontLeg_FrontLowerLeg")
+        # pyrosim.Send_Motor_Neuron( name = 10 , jointName = "LeftLeg_LeftLowerLeg")
+        # pyrosim.Send_Motor_Neuron( name = 11 , jointName = "RightLeg_RightLowerLeg")
 
-        pyrosim.Send_Hidden_Neuron(name = 12)
-        pyrosim.Send_Hidden_Neuron(name = 13)
-        pyrosim.Send_Hidden_Neuron(name = 14)
-        pyrosim.Send_Hidden_Neuron(name = 15)
+        # pyrosim.Send_Hidden_Neuron(name = 12)
+        # pyrosim.Send_Hidden_Neuron(name = 13)
+        # pyrosim.Send_Hidden_Neuron(name = 14)
+        # pyrosim.Send_Hidden_Neuron(name = 15)
+
+        for hiddenNeuronID in range(0, numHiddenNeurons):
+            pyrosim.Send_Hidden_Neuron(name = self.numLinks + hiddenNeuronID)
 
 
         # pyrosim.Send_Synapse( sourceNeuronName = 0 , targetNeuronName = 3 , weight = -1.0 )
         # pyrosim.Send_Synapse( sourceNeuronName = 1 , targetNeuronName = 3 , weight = -1.0 )
         # pyrosim.Send_Synapse( sourceNeuronName = 2 , targetNeuronName = 4 , weight = 1.0 )
 
-        for currentRow in range(0, c.numHiddenNeurons):
-            for currentColumn in range(0, c.numSensorNeurons):
-                    pyrosim.Send_Synapse( sourceNeuronName = currentColumn , targetNeuronName = currentRow + c.numSensorNeurons , weight = self.weights[0][currentRow][currentColumn] )
+        for currentRow in range(0, numHiddenNeurons):
+            for currentColumn in range(0, len(self.sensorIDs)):
+                    pyrosim.Send_Synapse( sourceNeuronName = currentColumn + self.numLinks + numHiddenNeurons , targetNeuronName = currentRow + self.numLinks , weight = self.weights[0][currentRow][currentColumn] )
 
-        for currentRow in range(0, c.numHiddenNeurons):
-            for currentColumn in range(0, c.numMotorNeurons):
-                    pyrosim.Send_Synapse( sourceNeuronName = currentRow + c.numSensorNeurons + c.numMotorNeurons , targetNeuronName = currentRow + c.numSensorNeurons , weight = self.weights[1][currentRow][currentColumn] )
+        for currentRow in range(0, numHiddenNeurons):
+            for currentColumn in range(0, self.numLinks):
+                    pyrosim.Send_Synapse( sourceNeuronName = currentRow + self.numLinks , targetNeuronName = currentColumn , weight = self.weights[1][currentRow][currentColumn] )
 
 
         pyrosim.End()
