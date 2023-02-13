@@ -13,7 +13,7 @@ class MATERIAL:
         if colorName == 'blue':
             self.string2 = '    <color rgba="0 0.0 1.0 1.0"/>'
         elif colorName == 'green':
-            self.string2 = '    <color rgba="0 0.0 1.0 0.0"/>'
+            self.string2 = '    <color rgba="0 1.0 0.0 1.0"/>'
         else:
             self.string2 = '    <color rgba="0 1.0 1.0 1.0"/>'
 

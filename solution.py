@@ -30,7 +30,8 @@ class SOLUTION:
         self.Create_World()
         self.Create_Body()
         self.Create_Brain()
-        os.system("python3 simulate.py " + directOrGUI + " " + str(self.myID) + " 2&>1 &")
+        # os.system("python3 simulate.py " + directOrGUI + " " + str(self.myID) + " 2&>1 &")
+        os.system("python3 simulate.py " + directOrGUI + " " + str(self.myID) + " &")
 
     def Wait_For_Simulation_To_End(self):
         while not os.path.exists("fitness" + str(self.myID) + ".txt"):
@@ -90,6 +91,8 @@ class SOLUTION:
 
         pyrosim.Start_URDF("body.urdf")
 
+        self.sensorIDs = []
+
         # pyrosim.Send_Cube(name = "0", pos = [0, 0, 1], size = size)
         for id in range(0, self.numLinks):
             pos = size
@@ -108,9 +111,9 @@ class SOLUTION:
         pyrosim.End()
 
     def Create_Random_Link(self, id, pos, size, endFlag, colorName):
-        pyrosim.Send_Cube(name=str(id), pos=pos, size=size, colorName = colorName)
+        pyrosim.Send_Cube(name=str(id), pos=[x / 2 for x in size], size=size, colorName = colorName)
         if id == 0:
-            pyrosim.Send_Joint(name = str(id) + "_" + str(id+1) , parent= str(id) , child = str(id+1) , type = "revolute", position = [size[0], size[1], size[2] + 1], jointAxis = "1 0 0")
+            pyrosim.Send_Joint(name = str(id) + "_" + str(id+1) , parent= str(id) , child = str(id+1) , type = "revolute", position = [size[0]/2, size[1]/2, size[2]/2 + 0.5], jointAxis = "1 0 0")
         elif not endFlag:
             pyrosim.Send_Joint(name = str(id) + "_" + str(id+1) , parent= str(id) , child = str(id+1) , type = "revolute", position = size, jointAxis = "1 0 0")
 
@@ -161,11 +164,15 @@ class SOLUTION:
 
         for currentRow in range(0, numHiddenNeurons):
             for currentColumn in range(0, len(self.sensorIDs)):
-                    pyrosim.Send_Synapse( sourceNeuronName = currentColumn + self.numLinks - 1 + numHiddenNeurons , targetNeuronName = currentRow + self.numLinks - 1 , weight = self.weights[0][currentRow][currentColumn] )
+                    sensorName = currentColumn + (self.numLinks-1) + numHiddenNeurons
+                    hiddenNeuronName = self.numLinks-1 + currentRow
+                    pyrosim.Send_Synapse( sourceNeuronName = sensorName , targetNeuronName = hiddenNeuronName , weight = self.weights[0][currentRow][currentColumn] )
 
         for currentRow in range(0, numHiddenNeurons):
             for currentColumn in range(0, self.numLinks-1):
-                    pyrosim.Send_Synapse( sourceNeuronName = currentRow + self.numLinks - 1 , targetNeuronName = currentColumn , weight = self.weights[1][currentRow][currentColumn] )
+                    motorName = currentColumn
+                    hiddenNeuronName = self.numLinks-1 + currentRow
+                    pyrosim.Send_Synapse( sourceNeuronName = hiddenNeuronName , targetNeuronName = motorName , weight = self.weights[1][currentRow][currentColumn] )
 
 
         pyrosim.End()
