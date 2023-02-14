@@ -25,6 +25,9 @@ The snakes were evolved with a fitness function that prioritized robots that min
 
 # Citations
 Code for this reposity is based on the following:
+
 [ludobots](https://www.reddit.com/r/ludobots/)
+
 [pybullet](https://pybullet.org/wordpress/)
+
 [pyrosim](https://github.com/ccappelle/pyrosim)
