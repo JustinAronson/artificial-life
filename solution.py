@@ -11,7 +11,7 @@ class SOLUTION:
     def __init__(self, nextAvailableID):
         self.myID = nextAvailableID
         self.sensorIDs = []
-        self.numLinks = random.randint(2, 4)
+        self.numLinks = random.randint(2, 10)
         self.weights = []
 
     def Evaluate(self, directOrGUI):
@@ -62,16 +62,16 @@ class SOLUTION:
         width = 1
         height = 3
 
-        x = -4
-        y = -4
+        x = -100
+        y = -100
         z = height/2
 
         pyrosim.Start_SDF("world.sdf")
 
         pyrosim.Send_Cube(name="Box1", pos=[x, y, z], size=[length, width, height])
 
-        x = -1
-        y = -2
+        x = -105
+        y = -105
         pyrosim.Send_Cube(name="Box2", pos=[x, y, z], size=[length, width, height])
 
         pyrosim.End()
@@ -113,10 +113,10 @@ class SOLUTION:
     def Create_Random_Link(self, id, pos, size, endFlag, colorName):
         if id == 0:
             pyrosim.Send_Cube(name=str(id), pos=[size[0]/2, 0, 1], size=size, colorName = colorName)
-            pyrosim.Send_Joint(name = str(id) + "_" + str(id+1) , parent= str(id) , child = str(id+1) , type = "revolute", position = [size[0], 0, 1], jointAxis = "1 0 0")
+            pyrosim.Send_Joint(name = str(id) + "_" + str(id+1) , parent= str(id) , child = str(id+1) , type = "revolute", position = [size[0], 0, 1], jointAxis = "1 1 0")
         elif not endFlag:
             pyrosim.Send_Cube(name=str(id), pos=[size[0]/2, 0, 0], size=size, colorName = colorName)
-            pyrosim.Send_Joint(name = str(id) + "_" + str(id+1) , parent= str(id) , child = str(id+1) , type = "revolute", position = [size[0], 0, 0], jointAxis = "1 0 0")
+            pyrosim.Send_Joint(name = str(id) + "_" + str(id+1) , parent= str(id) , child = str(id+1) , type = "revolute", position = [size[0], 0, 0], jointAxis = "1 1 0")
         else:
             pyrosim.Send_Cube(name=str(id), pos=[size[0]/2, 0, 0], size=size, colorName = colorName)
 
