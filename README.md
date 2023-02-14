@@ -22,3 +22,9 @@ Simulation specific variables, such as the number of links in the snake, the ran
 The simulation submitted for Assignment 6 used the constants found in constants.py. A population size of 1 was simulated over 5 generations. Each snake had a motor joint range of 0.2. The snakes had a random number of sensor neurons, but a fixed number of hidden neurons, 4, that connected the sensors to the motors. Each link of the snake has a motor neuron. Links that function as sensor neurons are colored green, while links that are not sensors are colored blue.
 
 The snakes were evolved with a fitness function that prioritized robots that minimized the euclidean distance between themselves and the point (-100, -100).
+
+# Citations
+Code for this reposity is based on the following:
+[ludobots](https://www.reddit.com/r/ludobots/)
+[pybullet](https://pybullet.org/wordpress/)
+[pyrosim](https://github.com/ccappelle/pyrosim)
