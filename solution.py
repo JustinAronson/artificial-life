@@ -111,9 +111,9 @@ class SOLUTION:
         pyrosim.End()
 
     def Create_Random_Link(self, id, pos, size, endFlag, colorName):
-        pyrosim.Send_Cube(name=str(id), pos=[x / 2 for x in size], size=size, colorName = colorName)
+        pyrosim.Send_Cube(name=str(id), pos=[x / 4 for x in size], size=size, colorName = colorName)
         if id == 0:
-            pyrosim.Send_Joint(name = str(id) + "_" + str(id+1) , parent= str(id) , child = str(id+1) , type = "revolute", position = [size[0]/2, size[1]/2, size[2]/2 + 0.5], jointAxis = "1 0 0")
+            pyrosim.Send_Joint(name = str(id) + "_" + str(id+1) , parent= str(id) , child = str(id+1) , type = "revolute", position = [size[0], size[1], size[2]], jointAxis = "1 0 0")
         elif not endFlag:
             pyrosim.Send_Joint(name = str(id) + "_" + str(id+1) , parent= str(id) , child = str(id+1) , type = "revolute", position = size, jointAxis = "1 0 0")
 
