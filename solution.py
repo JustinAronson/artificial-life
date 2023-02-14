@@ -11,7 +11,7 @@ class SOLUTION:
     def __init__(self, nextAvailableID):
         self.myID = nextAvailableID
         self.sensorIDs = []
-        self.numLinks = random.randint(2, 10)
+        self.numLinks = random.randint(c.minLinks, c.maxLinks)
         self.weights = []
 
     def Evaluate(self, directOrGUI):
