@@ -15,7 +15,7 @@ class ROBOT:
         self.Prepare_To_Sense()
         self.Prepare_To_Act()
         self.nn = NEURAL_NETWORK("brain" + solutionID + ".nndf")
-        # os.system("rm brain" + str(solutionID) + ".nndf")
+        os.system("rm brain" + str(solutionID) + ".nndf")
         self.solutionID = solutionID
         self.robotPositionDifference = 200
         self.boxPositionDifference = 200
@@ -51,7 +51,8 @@ class ROBOT:
         positionOfLinkZero = stateOfLinkZero[0]
         xCoordinateOfLinkZero = positionOfLinkZero[0]
         f = open("tmp" + str(self.solutionID) + ".txt", "w")
-        f.write(str(self.robotPositionDifference + self.boxPositionDifference*4))
+        # f.write(str(self.robotPositionDifference + self.boxPositionDifference*4))
+        f.write(str(self.robotPositionDifference))
         f.close()
 
         os.system("mv tmp" + str(self.solutionID) + ".txt fitness" + str(self.solutionID) + ".txt")
