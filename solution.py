@@ -99,26 +99,50 @@ class SOLUTION:
             # size = random.sample(range(0.1, 2), 3)
             size = [x / 10 for x in random.sample(range(1, 20), 3)]
 
-            print(size)
-
-            # Make a link a sensor 50% of the time. If no links are sensor links, make the last link a sensor
-            if (random.random() < 0.5) or (id == self.numLinks-1 and len(self.sensorIDs) == 0):
-                self.sensorIDs.append(id)
-                self.Create_Random_Link(id, pos, size, id == self.numLinks-1, 'green')
-            else:
-                self.Create_Random_Link(id, pos, size, id == self.numLinks-1, 'blue')                
+            print(size)              
 
         pyrosim.End()
 
-    def Create_Random_Link(self, id, pos, size, endFlag, colorName):
-        if id == 0:
-            pyrosim.Send_Cube(name=str(id), pos=[size[0]/2, 0, 1], size=size, colorName = colorName)
-            pyrosim.Send_Joint(name = str(id) + "_" + str(id+1) , parent= str(id) , child = str(id+1) , type = "revolute", position = [size[0], 0, 1], jointAxis = "1 1 0")
-        elif not endFlag:
-            pyrosim.Send_Cube(name=str(id), pos=[size[0]/2, 0, 0], size=size, colorName = colorName)
-            pyrosim.Send_Joint(name = str(id) + "_" + str(id+1) , parent= str(id) , child = str(id+1) , type = "revolute", position = [size[0], 0, 0], jointAxis = "1 1 0")
+    # Recursivley create links. Keep track of the direction that the link 'trees' have taken from the origin. They cannot go back in the same direction
+    # (turn back on themselves). Keep going until a certain depth is reached
+
+    def Create_Link_Tree(self, parentID, childID, depth, availableDirections):
+        directions = availableDirections.copy()
+        size = [x / 10 for x in random.sample(range(1, 20), 3)]
+        direction = random.choice(directions)
+        pos = [0, 0, 0]
+        # Shift the block from joint in the direction chosen. Multiply size by -1 if direction is negative
+        pos[abs(direction)] = size[abs(direction)]/2 * (direction / abs(direction))
+
+        # Prevent the link tree from doubling back on itself
+        if -1 * direction in directions:
+            directions.remove(-1 * direction)
+
+        # Last link in the tree. Base case.
+        if depth == c.maxLinks:
+
+            # If no links are sensor links, make end link a sensor. Otherwise, make the link a sensor 50% of the time
+            if (random.random() < 0.5) or (len(self.sensorIDs) == 0):
+                self.sensorIDs.append(parentID)
+                self.Create_Random_Link(parentID, childID, pos, size, True, 'green')
+            else:
+                self.Create_Random_Link(parentID, childID, pos, size, True, 'blue')
         else:
-            pyrosim.Send_Cube(name=str(id), pos=[size[0]/2, 0, 0], size=size, colorName = colorName)
+
+        
+        
+
+    # Creates a random link with id parentID. Also creates a joint from parentID to childID.
+    def Create_Random_Link(self, parentID, childID, pos, size, endFlag, colorName):
+        if id == 0:
+            # pyrosim.Send_Cube(name=str(parentID), pos=[size[0]/2, 0, 1], size=size, colorName = colorName)
+            pyrosim.Send_Cube(name=str(parentID), pos=pos, size=size, colorName = colorName)
+            pyrosim.Send_Joint(name = str(parentID) + "_" + str(childID) , parent= str(parentID) , child = str(childID) , type = "revolute", position = [2*pos[0], 2*pos[1], 2*pos[2] + 1], jointAxis = "1 1 0")
+        elif not endFlag:
+            pyrosim.Send_Cube(name=str(parentID), pos=pos, size=size, colorName = colorName)
+            pyrosim.Send_Joint(name = str(parentID) + "_" + str(childID) , parent= str(parentID) , child = str(childID) , type = "revolute", position = [x * 2 for x in pos], jointAxis = "1 1 0")
+        else:
+            pyrosim.Send_Cube(name=str(parentID), pos=pos, size=size, colorName = colorName)
 
     def Create_Brain(self):
         pyrosim.Start_NeuralNetwork("brain" + str(self.myID) + ".nndf")
