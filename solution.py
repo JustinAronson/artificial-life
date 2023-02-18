@@ -79,19 +79,27 @@ class SOLUTION:
 
 
     def Create_Body(self):
+        # length = random.randint(1, 20) / 20
+        # width = random.randint(1, 20) / 20
+        # height = random.randint(1, 20) / 20
+
+        # prevLength = length
+        # prevWidth = width
+        # prevHeight = height
+        
+        # Starting size will be reset, this is for position of the robot
+
         pyrosim.Start_URDF("body.urdf")
 
         self.sensorIDs = []
 
-        # size = [x / 10 for x in random.sample(range(1, 20), 3)]
-        # direction = random.choice(directions)
-        # pos = [0, 0, 0]
-        # # Shift the block from joint in the direction chosen. Multiply size by -1 if direction is negative
-        # pos[abs(direction)] = size[abs(direction)]/2 * (direction / abs(direction))
-        # pos[2] += 1
+        if random.random() < 0.5:
+            pyrosim.Send_Cube(name = "0", pos = [0, 0, 1], size = [x / 10 for x in random.sample(range(1, 20), 3)], colorName = 'green')
+            self.sensorIDs.append(0)
+        else:
+            pyrosim.Send_Cube(name = "0", pos = [0, 0, 1], size = [x / 10 for x in random.sample(range(1, 20), 3)], colorName = 'blue')
+        self.nextLinkID += 1
 
-        # pyrosim.Send_Cube(name="0", pos=[0, 0, 1], size=size, colorName = colorName)
-        # pyrosim.Send_Joint(name = "0_1" , parent= "0" , child = "1" , type = "revolute", position = [x * 2 for x in pos], jointAxis = "1 1 0")
 
         # pyrosim.Send_Cube(name = "0", pos = [0, 0, 1], size = size)
         # for id in range(0, self.numLinks):
@@ -119,34 +127,38 @@ class SOLUTION:
             directions.remove(-1 * direction)
 
         # Last link in the tree. Base case.
-        if depth >= c.maxLinks:
+        if depth == c.maxLinks:
             # If no links are sensor links, make end link a sensor. Otherwise, make the link a sensor 50% of the time
             if (random.random() < 0.5) or (len(self.sensorIDs) == 0):
                 self.sensorIDs.append(self.nextLinkID)
-                self.Create_Random_Link(parentID, self.nextLinkID, pos, size, 'green')
+                self.Create_Random_Link(None, self.nextLinkID, pos, size, True, 'green')
             else:
-                self.Create_Random_Link(parentID, self.nextLinkID, pos, size, 'blue')
+                self.Create_Random_Link(None, self.nextLinkID, pos, size, True, 'blue')
             self.nextLinkID += 1
         else:
             if (random.random() < 0.5):
-                if parentID == 0:
-                    pyrosim.Send_Cube(name=str(childID), pos=pos, size=size, colorName = colorName)
-                    pyrosim.Send_Joint(name = str(parentID) + "_" + str(childID) , parent= str(parentID) , child = str(childID) , type = "revolute", position = [x * 2 for x in pos], jointAxis = "1 1 0")
-                    pos[2] += 1
-                    
-                self.sensorIDs.append(self.nextLinkID)
-                self.Create_Random_Link(parentID, self.nextLinkID, pos, size, 'green')
+                self.Create_Random_Link(parentID, self.nextLinkID, pos, size, False, 'green')
             else:
-                self.Create_Random_Link(parentID, self.nextLinkID, pos, size, 'blue')
+                self.Create_Random_Link(parentID, self.nextLinkID, pos, size, False, 'blue')
             self.nextLinkID += 1
 
-            self.Create_Link_Tree(self.nextLinkID-1, depth + 1, directions)
+            self.Create_Link_Tree(self.nextLinkID-1, depth, directions)
+
+        
         
 
     # Creates a random link with id childID. Also creates a joint from parentID to childID.
-    def Create_Random_Link(self, parentID, childID, pos, size, colorName):
-        pyrosim.Send_Cube(name=str(childID), pos=pos, size=size, colorName = colorName)
-        pyrosim.Send_Joint(name = str(parentID) + "_" + str(childID) , parent= str(parentID) , child = str(childID) , type = "revolute", position = [x * 2 for x in pos], jointAxis = "1 1 0")
+    def Create_Random_Link(self, parentID, childID, pos, size, endFlag, colorName):
+        if parentID == 0:
+            pyrosim.Send_Cube(name=str(childID), pos=pos, size=size, colorName = colorName)
+            position = [x * 2 for x in pos]
+            position[2] += 1
+            pyrosim.Send_Joint(name = str(parentID) + "_" + str(childID) , parent= str(parentID) , child = str(childID) , type = "revolute", position = position, jointAxis = "1 1 0")
+        if not endFlag:
+            pyrosim.Send_Cube(name=str(childID), pos=pos, size=size, colorName = colorName)
+            pyrosim.Send_Joint(name = str(parentID) + "_" + str(childID) , parent= str(parentID) , child = str(childID) , type = "revolute", position = [x * 2 for x in pos], jointAxis = "1 1 0")
+        else:
+            pyrosim.Send_Cube(name=str(childID), pos=pos, size=size, colorName = colorName)
 
     def Create_Brain(self):
         pyrosim.Start_NeuralNetwork("brain" + str(self.myID) + ".nndf")
