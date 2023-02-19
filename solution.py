@@ -103,7 +103,7 @@ class SOLUTION:
         self.nextLinkID += 1
 
         # Don't let the robot go in the -z direction
-        self.Create_Link_Tree(0, 1, [-2, -1, 1, 2, 3], size, 1)
+        self.Create_Link_Tree(0, 1, [-2, -1, 1, 2, 3], size, 3)
 
 
         # pyrosim.Send_Cube(name = "0", pos = [0, 0, 1], size = size)

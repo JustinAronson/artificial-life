@@ -19,4 +19,4 @@ numHiddenNeurons = 4
 motorJointRange = 0.2
 
 minLinks = 4
-maxLinks = 2
+maxLinks = 8
