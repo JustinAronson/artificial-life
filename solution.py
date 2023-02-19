@@ -11,7 +11,7 @@ class SOLUTION:
     def __init__(self, nextAvailableID):
         self.myID = nextAvailableID
         self.sensorIDs = []
-        self.numLinks = random.randint(c.minLinks, c.maxLinks)
+        # self.numLinks = random.randint(c.minLinks, c.maxLinks)
         self.weights = []
         self.nextLinkID = 0
         self.joints = []
@@ -52,7 +52,7 @@ class SOLUTION:
 
         self.weights[0][row][column] = random.random() * 2 - 1
 
-        column = random.randint(0, self.numLinks - 1)
+        column = random.randint(0, len(self.joints))
         self.weights[1][row][column] = random.random() * 2 - 1
 
     def Set_ID(self, nextAvailableID):
