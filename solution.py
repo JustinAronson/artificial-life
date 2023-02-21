@@ -18,7 +18,7 @@ class SOLUTION:
         # Keep track of the space that current links occupy. 3 dimensional array - links, dimensions, space occipied
         self.occupiedSpace = []
         # Keep track of the absolute position of the last joint
-        self.lastAbsolutePos = [0, 0, 0]
+        self.lastAbsolutePos = {}
 
     def Evaluate(self, directOrGUI):
         pass
@@ -104,7 +104,8 @@ class SOLUTION:
             self.sensorIDs.append(0)
         else:
             pyrosim.Send_Cube(name = "0", pos = [0, 0, 1], size = size, colorName = 'blue')
-
+        
+        self.lastAbsolutePos[0] = [0, 0, 0]
         # Update the space that the links occupy
         space = []
         for axis in range(0, len(size)):
@@ -152,20 +153,21 @@ class SOLUTION:
             jointPos[abs(direction) - 1] += prevSize[abs(direction) - 1] / 2 * (direction / abs(direction))
 
         # Update the last position
+        self.lastAbsolutePos[self.nextLinkID] = [0, 0, 0]
         for axis in range(0, len(jointPos)):
-            self.lastAbsolutePos[axis] += jointPos[axis]
+            self.lastAbsolutePos[self.nextLinkID][axis] = self.lastAbsolutePos[parentID][axis] + jointPos[axis]
 
         for linkSpace in self.occupiedSpace:
             for axis in range(0, len(linkSpace)):
-                dim1min = self.lastAbsolutePos[axis] + pos[axis] - abs(size[axis] / 2)
-                dim1max = self.lastAbsolutePos[axis] + pos[axis] + abs(size[axis] / 2)
-                dim2min = self.lastAbsolutePos[(axis + 1) % 3] + pos[(axis + 1) % 3] - abs(size[(axis + 1) % 3] / 2)
-                dim2max = self.lastAbsolutePos[(axis + 1) % 3] + pos[(axis + 1) % 3] + abs(size[(axis + 1) % 3] / 2)
-                dim3min = self.lastAbsolutePos[(axis + 2) % 3] + pos[(axis + 2) % 3] - abs(size[(axis + 2) % 3] / 2)
-                dim3max = self.lastAbsolutePos[(axis + 2) % 3] + pos[(axis + 2) % 3] + abs(size[(axis + 2) % 3] / 2)
+                dim1min = self.lastAbsolutePos[self.nextLinkID][axis] + pos[axis] - abs(size[axis] / 2)
+                dim1max = self.lastAbsolutePos[self.nextLinkID][axis] + pos[axis] + abs(size[axis] / 2)
+                dim2min = self.lastAbsolutePos[self.nextLinkID][(axis + 1) % 3] + pos[(axis + 1) % 3] - abs(size[(axis + 1) % 3] / 2)
+                dim2max = self.lastAbsolutePos[self.nextLinkID][(axis + 1) % 3] + pos[(axis + 1) % 3] + abs(size[(axis + 1) % 3] / 2)
+                dim3min = self.lastAbsolutePos[self.nextLinkID][(axis + 2) % 3] + pos[(axis + 2) % 3] - abs(size[(axis + 2) % 3] / 2)
+                dim3max = self.lastAbsolutePos[self.nextLinkID][(axis + 2) % 3] + pos[(axis + 2) % 3] + abs(size[(axis + 2) % 3] / 2)
                 print('axis:' + str(axis))
                 print('axis + 1:' + str((axis + 1) % 3))
-                print('axis + 1 last pos value:' + str(self.lastAbsolutePos[(axis + 1) % 3]))
+                print('axis + 1 last pos value:' + str(self.lastAbsolutePos[self.nextLinkID][(axis + 1) % 3]))
                 # Give 0.1 margin because of rounding
                 while (((linkSpace[axis][0]+0.01) < dim1min < (linkSpace[axis][1]-0.01)) or 
                     ((linkSpace[axis][0]+0.01) < dim1max < (linkSpace[axis][1]-0.01))):
@@ -229,8 +231,8 @@ class SOLUTION:
         # Update the space that the links occupy
         space = []
         for axis in range(0, len(size)):
-            min = self.lastAbsolutePos[axis] + pos[axis] - abs(size[axis] / 2)
-            max = self.lastAbsolutePos[axis] + pos[axis] + abs(size[axis] / 2)
+            min = self.lastAbsolutePos[self.nextLinkID][axis] + pos[axis] - abs(size[axis] / 2)
+            max = self.lastAbsolutePos[self.nextLinkID][axis] + pos[axis] + abs(size[axis] / 2)
             space.append([min, max])
         self.occupiedSpace.append(space)
 
