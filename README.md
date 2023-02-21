@@ -14,14 +14,14 @@ Navigate to the snakes branch, and run the command
 ```bash 
 python3 search.py
 ```
-After a short wait, the final evolved simulation should appear in a separate window.
+After a short wait, the simulation should appear in a separate window.
 
 Simulation specific variables, such as the number of links in the snake, the range that the joints can move in, and the number of generations that evolve are determined in the file constants.py, located in the main folder. Feel free to change these.
 
 # Simulation Overview
-The simulation submitted for Assignment 6 used the constants found in constants.py. A population size of 1 was simulated over 5 generations. Each snake had a motor joint range of 0.2. The snakes had a random number of sensor neurons, but a fixed number of hidden neurons, 4, that connected the sensors to the motors. Each link of the snake has a motor neuron. Links that function as sensor neurons are colored green, while links that are not sensors are colored blue.
+The simulation submitted for Assignment 7 used the constants found in constants.py. The snakes were not evolved. Links and neurons were generated according to the following diagram: [Assignment 7 Diagram.pdf](https://github.com/JustinAronson/artificial-life/files/10789815/Assignment.7.Diagram.pdf). The maximum depth for links is specified in the constants.py file.
 
-The snakes were evolved with a fitness function that prioritized robots that minimized the euclidean distance between themselves and the point (-100, -100).
+At least one sensor neuron will be generated in every iteration of the simulation. If no links have been sensor neurons, the first time the generation algorithm reaches the maximum tree depth it will assign the link to be a sensor neuron. Motor neurons are generated for every joint in the robot, for a total of (number of links - 1) joints. The number of hidden neurons is specified in the constants.py file. Hidden neurons will always be generated in a single layer, receive input from all sensor neurons, and output to all motor neurons.
 
 # Citations
 Code for this reposity is based on the following:
