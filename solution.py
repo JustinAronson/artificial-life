@@ -136,7 +136,7 @@ class SOLUTION:
 
     def Create_Link_Tree(self, parentID, depth, availableDirections, prevSize, prevDirection):
         directions = availableDirections.copy()
-        size = [x / 10 for x in random.sample(range(1, 20), 3)]
+        size = [x / 2 for x in random.sample(range(1, 10), 3)]
         direction = random.choice(directions)
         pos = [0, 0, 0]
 
@@ -158,14 +158,17 @@ class SOLUTION:
         for axis in range(0, len(jointPos)):
             self.lastAbsolutePos[self.nextLinkID][axis] = self.lastAbsolutePos[parentID][axis] + jointPos[axis]
 
-        pos, size = self.Check_For_Intersections(pos, size, direction)
+        pos, size, noSpaceFlag = self.Check_For_Intersections(pos, size, direction)
+
+        if noSpaceFlag:
+            return
 
         # Prevent the link tree from doubling back on itself
         if -1 * direction in directions:
             directions.remove(-1 * direction)
 
         # Last link in the tree. Base case.
-        if depth == c.maxLinks:
+        if depth == c.maxDepth:
             # If no links are sensor links, make end link a sensor. Otherwise, make the link a sensor 50% of the time
             if (random.random() < 0.5) or (len(self.sensorIDs) == 0):
                 self.sensorIDs.append(self.nextLinkID)
@@ -180,15 +183,23 @@ class SOLUTION:
             # 10% chance of ending the branch
             # if (random.random() < 0.1):
             #     return
+            if len(directions) == 1:
+                self.Create_Link_Tree(self.nextLinkID-1, depth + 1, directions, size, direction)
+            else:
+                numBranches = random.randint(1, len(directions) - 1)
+                spliceStart = 0
+                while spliceStart < len(directions):
+                    if spliceStart + math.floor(len(directions)/numBranches) <= len(directions):
+                        self.Create_Link_Tree(self.nextLinkID-1, depth + 1, directions[spliceStart:spliceStart + math.floor(len(directions)/numBranches)], size, direction)
+                    else:
+                        self.Create_Link_Tree(self.nextLinkID-1, depth + 1, directions[spliceStart:], size, direction)
+                    spliceStart += math.floor(len(directions)/numBranches)
 
-            # numBranches = random.randint(1, len(directions) - 1)
-            # spliceStart = 0
-            # while spliceStart < len(directions):
-            #     self.Create_Link_Tree(self.nextLinkID-1, depth + 1, directions[spliceStart:spliceStart + Math.floor(len(directions)/numBranches)], size, direction)
-            self.Create_Link_Tree(self.nextLinkID-1, depth + 1, directions, size, direction)
+            # self.Create_Link_Tree(self.nextLinkID-1, depth + 1, directions, size, direction)
 
         
     def Check_For_Intersections(self, pos, size, direction):
+        noSpaceFlag = False
         for linkSpace in self.occupiedSpace:
             for axis in range(0, len(linkSpace)):
                 dim1min = self.lastAbsolutePos[self.nextLinkID][axis] + pos[axis] - abs(size[axis] / 2)
@@ -197,36 +208,47 @@ class SOLUTION:
                 dim2max = self.lastAbsolutePos[self.nextLinkID][(axis + 1) % 3] + pos[(axis + 1) % 3] + abs(size[(axis + 1) % 3] / 2)
                 dim3min = self.lastAbsolutePos[self.nextLinkID][(axis + 2) % 3] + pos[(axis + 2) % 3] - abs(size[(axis + 2) % 3] / 2)
                 dim3max = self.lastAbsolutePos[self.nextLinkID][(axis + 2) % 3] + pos[(axis + 2) % 3] + abs(size[(axis + 2) % 3] / 2)
-                print('axis:' + str(axis))
-                print('axis + 1:' + str((axis + 1) % 3))
-                print('axis + 1 last pos value:' + str(self.lastAbsolutePos[self.nextLinkID][(axis + 1) % 3]))
+                # print('axis:' + str(axis))
+                # print('axis + 1:' + str((axis + 1) % 3))
+                # print('axis + 1 last pos value:' + str(self.lastAbsolutePos[self.nextLinkID][(axis + 1) % 3]))
                 # Give 0.1 margin because of rounding
                 while (((linkSpace[axis][0]+0.01) < dim1min < (linkSpace[axis][1]-0.01)) or 
-                    ((linkSpace[axis][0]+0.01) < dim1max < (linkSpace[axis][1]-0.01))):
-                    print("Dim 1 check passed")
+                    ((linkSpace[axis][0]+0.01) < dim1max < (linkSpace[axis][1]-0.01))) or ((linkSpace[axis][0]+0.01) > dim1min
+                    and dim1max > (linkSpace[axis][1]-0.01)):
+                    # print("Dim 1 check passed")
                     if ((linkSpace[(axis + 1) % 3][0]+0.01 < dim2min < linkSpace[(axis + 1) % 3][1]-0.01) or 
-                        (linkSpace[(axis + 1) % 3][0]+0.01 < dim2max < linkSpace[(axis + 1) % 3][1]-0.01)):
-                        print("Dim 2 check passed")
+                        (linkSpace[(axis + 1) % 3][0]+0.01 < dim2max < linkSpace[(axis + 1) % 3][1]-0.01)) or ((linkSpace[(axis + 1) % 3][0]+0.01) > dim2min
+                        and dim2max > (linkSpace[(axis + 1) % 3][1]-0.01)):
+                        # print("Dim 2 check passed")
                         if ((linkSpace[(axis + 2) % 3][0]+0.01 < dim3min < linkSpace[(axis + 2) % 3][1]-0.01) or 
-                            (linkSpace[(axis + 2) % 3][0]+0.01 < dim3max < linkSpace[(axis + 2) % 3][1]-0.01)):
+                            (linkSpace[(axis + 2) % 3][0]+0.01 < dim3max < linkSpace[(axis + 2) % 3][1]-0.01)) or ((linkSpace[(axis + 2) % 3][0]+0.01) > dim3min
+                            and dim3max > (linkSpace[(axis + 2) % 3][1]-0.01)):
                             ("Dim 3 check passed")
 
-                            dimensionToChange = random.randint(0, 2)
+                            dimensionToChange = 0
+                            if size[dimensionToChange] < 0.2:
+                                dimensionToChange = 1
+                                if size[dimensionToChange] < 0.2:
+                                    dimensionToChange = 2
+                                    if size[dimensionToChange] < 0.2:
+                                        print('All dimensions small')
+                                        noSpaceFlag = True
+                                        break
                             size[dimensionToChange] -= 0.05
-                            print("Dimension: " + str(dimensionToChange) + "Size: " + str(size[dimensionToChange]))
+                            # print("Dimension: " + str(dimensionToChange) + "Size: " + str(size[dimensionToChange]))
                             if (dimensionToChange == abs(direction) - 1):
                                 pos[abs(direction) - 1] = size[abs(direction) - 1]/2 * (direction / abs(direction))
                             dim1min = self.lastAbsolutePos[self.nextLinkID][axis] + pos[axis] - abs(size[axis] / 2)
                             dim1max = self.lastAbsolutePos[self.nextLinkID][axis] + pos[axis] + abs(size[axis] / 2)
                             dim2min = self.lastAbsolutePos[self.nextLinkID][(axis + 1) % 3] + pos[(axis + 1) % 3] - abs(size[(axis + 1) % 3] / 2)
                             dim2max = self.lastAbsolutePos[self.nextLinkID][(axis + 1) % 3] + pos[(axis + 1) % 3] + abs(size[(axis + 1) % 3] / 2)
-                            dim3min = self.lastAbsolutePos[self.nextLinkID][(axis + 2) % 3] + pos[(axis + 2) % 3] - abs(size[(axis + 1) % 3] / 2)
-                            dim3max = self.lastAbsolutePos[self.nextLinkID][(axis + 2) % 3] + pos[(axis + 2) % 3] + abs(size[(axis + 1) % 3] / 2)
+                            dim3min = self.lastAbsolutePos[self.nextLinkID][(axis + 2) % 3] + pos[(axis + 2) % 3] - abs(size[(axis + 2) % 3] / 2)
+                            dim3max = self.lastAbsolutePos[self.nextLinkID][(axis + 2) % 3] + pos[(axis + 2) % 3] + abs(size[(axis + 2) % 3] / 2)
                         else:
                             break
                     else:
                         break
-        return pos, size
+        return pos, size, noSpaceFlag
 
     # Creates a random link with id childID. Also creates a joint from parentID to childID.
     def Create_Random_Link(self, parentID, childID, pos, size, colorName, jointPos):
