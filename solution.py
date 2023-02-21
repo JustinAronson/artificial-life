@@ -5,6 +5,7 @@ import random
 import os
 import time
 import constants as c
+import math
 
 class SOLUTION:
 
@@ -157,6 +158,37 @@ class SOLUTION:
         for axis in range(0, len(jointPos)):
             self.lastAbsolutePos[self.nextLinkID][axis] = self.lastAbsolutePos[parentID][axis] + jointPos[axis]
 
+        pos, size = self.Check_For_Intersections(pos, size, direction)
+
+        # Prevent the link tree from doubling back on itself
+        if -1 * direction in directions:
+            directions.remove(-1 * direction)
+
+        # Last link in the tree. Base case.
+        if depth == c.maxLinks:
+            # If no links are sensor links, make end link a sensor. Otherwise, make the link a sensor 50% of the time
+            if (random.random() < 0.5) or (len(self.sensorIDs) == 0):
+                self.sensorIDs.append(self.nextLinkID)
+                self.Create_Random_Link(parentID, self.nextLinkID, pos, size, 'green', jointPos)
+            else:
+                self.Create_Random_Link(parentID, self.nextLinkID, pos, size, 'blue', jointPos)
+        else:
+            if (random.random() < 0.5):
+                self.Create_Random_Link(parentID, self.nextLinkID, pos, size, 'green', jointPos)
+            else:
+                self.Create_Random_Link(parentID, self.nextLinkID, pos, size, 'blue', jointPos)
+            # 10% chance of ending the branch
+            # if (random.random() < 0.1):
+            #     return
+
+            # numBranches = random.randint(1, len(directions) - 1)
+            # spliceStart = 0
+            # while spliceStart < len(directions):
+            #     self.Create_Link_Tree(self.nextLinkID-1, depth + 1, directions[spliceStart:spliceStart + Math.floor(len(directions)/numBranches)], size, direction)
+            self.Create_Link_Tree(self.nextLinkID-1, depth + 1, directions, size, direction)
+
+        
+    def Check_For_Intersections(self, pos, size, direction):
         for linkSpace in self.occupiedSpace:
             for axis in range(0, len(linkSpace)):
                 dim1min = self.lastAbsolutePos[self.nextLinkID][axis] + pos[axis] - abs(size[axis] / 2)
@@ -184,40 +216,17 @@ class SOLUTION:
                             print("Dimension: " + str(dimensionToChange) + "Size: " + str(size[dimensionToChange]))
                             if (dimensionToChange == abs(direction) - 1):
                                 pos[abs(direction) - 1] = size[abs(direction) - 1]/2 * (direction / abs(direction))
-                            dim1min = self.lastAbsolutePos[axis] + pos[axis] - abs(size[axis] / 2)
-                            dim1max = self.lastAbsolutePos[axis] + pos[axis] + abs(size[axis] / 2)
-                            dim2min = self.lastAbsolutePos[(axis + 1) % 3] + pos[(axis + 1) % 3] - abs(size[(axis + 1) % 3] / 2)
-                            dim2max = self.lastAbsolutePos[(axis + 1) % 3] + pos[(axis + 1) % 3] + abs(size[(axis + 1) % 3] / 2)
-                            dim3min = self.lastAbsolutePos[(axis + 2) % 3] + pos[(axis + 2) % 3] - abs(size[(axis + 1) % 3] / 2)
-                            dim3max = self.lastAbsolutePos[(axis + 2) % 3] + pos[(axis + 2) % 3] + abs(size[(axis + 1) % 3] / 2)
+                            dim1min = self.lastAbsolutePos[self.nextLinkID][axis] + pos[axis] - abs(size[axis] / 2)
+                            dim1max = self.lastAbsolutePos[self.nextLinkID][axis] + pos[axis] + abs(size[axis] / 2)
+                            dim2min = self.lastAbsolutePos[self.nextLinkID][(axis + 1) % 3] + pos[(axis + 1) % 3] - abs(size[(axis + 1) % 3] / 2)
+                            dim2max = self.lastAbsolutePos[self.nextLinkID][(axis + 1) % 3] + pos[(axis + 1) % 3] + abs(size[(axis + 1) % 3] / 2)
+                            dim3min = self.lastAbsolutePos[self.nextLinkID][(axis + 2) % 3] + pos[(axis + 2) % 3] - abs(size[(axis + 1) % 3] / 2)
+                            dim3max = self.lastAbsolutePos[self.nextLinkID][(axis + 2) % 3] + pos[(axis + 2) % 3] + abs(size[(axis + 1) % 3] / 2)
                         else:
                             break
                     else:
                         break
-
-
-        # Prevent the link tree from doubling back on itself
-        if -1 * direction in directions:
-            directions.remove(-1 * direction)
-
-        # Last link in the tree. Base case.
-        if depth == c.maxLinks:
-            # If no links are sensor links, make end link a sensor. Otherwise, make the link a sensor 50% of the time
-            if (random.random() < 0.5) or (len(self.sensorIDs) == 0):
-                self.sensorIDs.append(self.nextLinkID)
-                self.Create_Random_Link(parentID, self.nextLinkID, pos, size, 'green', jointPos)
-            else:
-                self.Create_Random_Link(parentID, self.nextLinkID, pos, size, 'blue', jointPos)
-        else:
-            if (random.random() < 0.5):
-                self.Create_Random_Link(parentID, self.nextLinkID, pos, size, 'green', jointPos)
-            else:
-                self.Create_Random_Link(parentID, self.nextLinkID, pos, size, 'blue', jointPos)
-
-            self.Create_Link_Tree(self.nextLinkID-1, depth + 1, directions, size, direction)
-
-        
-        
+        return pos, size
 
     # Creates a random link with id childID. Also creates a joint from parentID to childID.
     def Create_Random_Link(self, parentID, childID, pos, size, colorName, jointPos):
