@@ -15,6 +15,10 @@ class SOLUTION:
         self.weights = []
         self.nextLinkID = 0
         self.joints = []
+        # Keep track of the space that current links occupy. 3 dimensional array - links, dimensions, space occipied
+        self.occupiedSpace = []
+        # Keep track of the absolute position of the last joint
+        self.lastAbsolutePos = [0, 0, 0]
 
     def Evaluate(self, directOrGUI):
         pass
@@ -89,20 +93,29 @@ class SOLUTION:
         # prevHeight = height
         
         size = [x / 10 for x in random.sample(range(1, 20), 3)]
+        pos = [0, 0, 1]
 
         pyrosim.Start_URDF("body.urdf")
 
         self.sensorIDs = []
-
 
         if random.random() < 0.5:
             pyrosim.Send_Cube(name = "0", pos = [0, 0, 1], size = size, colorName = 'green')
             self.sensorIDs.append(0)
         else:
             pyrosim.Send_Cube(name = "0", pos = [0, 0, 1], size = size, colorName = 'blue')
+
+        # Update the space that the links occupy
+        space = []
+        for axis in range(0, len(size)):
+            min = pos[axis] - abs(size[axis] / 2)
+            max = pos[axis] + abs(size[axis] / 2)
+            space.append([min, max])
+        self.occupiedSpace.append(space)
+
         self.nextLinkID += 1
 
-        # Don't let the robot go in the -z direction
+        # Don't let the robot go in the -z direction, so don't include -3 in directions
         self.Create_Link_Tree(0, 1, [-2, -1, 1, 2, 3], size, 3)
 
 
@@ -124,12 +137,49 @@ class SOLUTION:
         size = [x / 10 for x in random.sample(range(1, 20), 3)]
         direction = random.choice(directions)
         pos = [0, 0, 0]
+
+        # While size is within position from previous links, shrink link
+
         # Shift the block from joint in the direction chosen. Multiply size by -1 if direction is negative
         pos[abs(direction) - 1] = size[abs(direction) - 1]/2 * (direction / abs(direction))
 
         jointPos = [0, 0, 0]
-        jointPos[abs(prevDirection) - 1] = prevSize[abs(prevDirection) - 1] / 2 * (prevDirection / abs(prevDirection))
-        jointPos[abs(direction) - 1] += prevSize[abs(direction) - 1] / 2 * (direction / abs(direction))
+        if depth == 1:
+            jointPos[2] = 1
+            jointPos[abs(direction) - 1] += prevSize[abs(direction) - 1] / 2 * (direction / abs(direction))
+        else:
+            jointPos[abs(prevDirection) - 1] = prevSize[abs(prevDirection) - 1] / 2 * (prevDirection / abs(prevDirection))
+            jointPos[abs(direction) - 1] += prevSize[abs(direction) - 1] / 2 * (direction / abs(direction))
+
+        # Update the last position
+        for axis in range(0, len(jointPos)):
+            self.lastAbsolutePos[axis] += jointPos[axis]
+
+        for linkSpace in self.occupiedSpace:
+            for axis in range(0, len(linkSpace)):
+                dim1min = self.lastAbsolutePos[axis] + pos[axis] - abs(size[axis] / 2)
+                dim1max = self.lastAbsolutePos[axis] + pos[axis] + abs(size[axis] / 2)
+                dim2min = self.lastAbsolutePos[(axis + 1) % 3] + pos[(axis + 1) % 3] - abs(size[(axis + 1) % 3] / 2)
+                dim2max = self.lastAbsolutePos[(axis + 1) % 3] + pos[(axis + 1) % 3] + abs(size[(axis + 1) % 3] / 2)
+                dim3min = self.lastAbsolutePos[(axis + 2) % 3] + pos[(axis + 2) % 3] - abs(size[(axis + 1) % 3] / 2)
+                dim3max = self.lastAbsolutePos[(axis + 2) % 3] + pos[(axis + 2) % 3] + abs(size[(axis + 1) % 3] / 2)
+                while {((linkSpace[axis][0] < dim1min < linkSpace[axis][1]) or 
+                    (linkSpace[axis][0] < dim1max < linkSpace[axis][1])) and 
+                    (((linkSpace[(axis + 1) % 3][0] < dim2min < linkSpace[(axis + 1) % 3][1]) or 
+                    (linkSpace[(axis + 1) % 3][0] < dim2max < linkSpace[(axis + 1) % 3][1])) and
+                    ((linkSpace[(axis + 2) % 3][0] < dim3min < linkSpace[(axis + 2) % 3][1]) or 
+                    (linkSpace[(axis + 2) % 3][0] < dim3max < linkSpace[(axis + 2) % 3][1])))}:
+
+                    dimensionToChange = random.randint(0, 2)
+                    size[dimensionToChange] -= 0.05
+                    if (dimensionToChange == abs(direction) - 1):
+                        pos[abs(direction) - 1] = size[abs(direction) - 1]/2 * (direction / abs(direction))
+                    dim1min = self.lastAbsolutePos[axis] + pos[axis] - abs(size[axis] / 2)
+                    dim1max = self.lastAbsolutePos[axis] + pos[axis] + abs(size[axis] / 2)
+                    dim2min = self.lastAbsolutePos[(axis + 1) % 3] + pos[(axis + 1) % 3] - abs(size[(axis + 1) % 3] / 2)
+                    dim2max = self.lastAbsolutePos[(axis + 1) % 3] + pos[(axis + 1) % 3] + abs(size[(axis + 1) % 3] / 2)
+                    dim3min = self.lastAbsolutePos[(axis + 2) % 3] + pos[(axis + 2) % 3] - abs(size[(axis + 1) % 3] / 2)
+                    dim3max = self.lastAbsolutePos[(axis + 2) % 3] + pos[(axis + 2) % 3] + abs(size[(axis + 1) % 3] / 2)
 
 
         # Prevent the link tree from doubling back on itself
@@ -159,11 +209,18 @@ class SOLUTION:
     def Create_Random_Link(self, parentID, childID, pos, size, colorName, jointPos):
         if parentID == 0:
             pyrosim.Send_Cube(name=str(childID), pos=pos, size=size, colorName = colorName)
-            jointPos[2] += 1
             pyrosim.Send_Joint(name = str(parentID) + "_" + str(childID) , parent= str(parentID) , child = str(childID) , type = "revolute", position = jointPos, jointAxis = "1 1 0")
         else:
             pyrosim.Send_Cube(name=str(childID), pos=pos, size=size, colorName = colorName)
             pyrosim.Send_Joint(name = str(parentID) + "_" + str(childID) , parent= str(parentID) , child = str(childID) , type = "revolute", position = jointPos, jointAxis = "1 1 0")
+
+        # Update the space that the links occupy
+        space = []
+        for axis in range(0, len(size)):
+            min = self.lastAbsolutePos[axis] + pos[axis] - abs(size[axis] / 2)
+            max = self.lastAbsolutePos[axis] + pos[axis] + abs(size[axis] / 2)
+            space.append([min, max])
+        self.occupiedSpace.append(space)
 
         self.joints.append([parentID, childID])
         self.nextLinkID += 1
