@@ -172,16 +172,19 @@ class SOLUTION:
             # 10% chance of ending the branch
             # if (random.random() < 0.1):
             #     return
+
+            linkID = self.nextLinkID-1
+
             if len(directions) == 1:
-                self.Create_Link_Tree(self.nextLinkID-1, depth + 1, directions, size, direction)
+                self.Create_Link_Tree(linkID, depth + 1, directions, size, direction)
             else:
                 numBranches = random.randint(1, len(directions) - 1)
                 spliceStart = 0
                 while spliceStart < len(directions):
                     if spliceStart + math.floor(len(directions)/numBranches) <= len(directions):
-                        self.Create_Link_Tree(self.nextLinkID-1, depth + 1, directions[spliceStart:spliceStart + math.floor(len(directions)/numBranches)], size, direction)
+                        self.Create_Link_Tree(linkID, depth + 1, directions[spliceStart:spliceStart + math.floor(len(directions)/numBranches)], size, direction)
                     else:
-                        self.Create_Link_Tree(self.nextLinkID-1, depth + 1, directions[spliceStart:], size, direction)
+                        self.Create_Link_Tree(linkID, depth + 1, directions[spliceStart:], size, direction)
                     spliceStart += math.floor(len(directions)/numBranches)
 
             # self.Create_Link_Tree(self.nextLinkID-1, depth + 1, directions, size, direction)
@@ -243,27 +246,29 @@ class SOLUTION:
                         if ((linkSpace[(axis + 2) % 3][0]+0.01 < dim3min < linkSpace[(axis + 2) % 3][1]-0.01) or 
                             (linkSpace[(axis + 2) % 3][0]+0.01 < dim3max < linkSpace[(axis + 2) % 3][1]-0.01)) or ((linkSpace[(axis + 2) % 3][0]+0.01) > dim3min
                             and dim3max > (linkSpace[(axis + 2) % 3][1]-0.01)):
-                            ("Dim 3 check passed")
+                            print("No space")
 
-                            dimensionToChange = 0
-                            if size[dimensionToChange] < 0.2:
-                                dimensionToChange = 1
-                                if size[dimensionToChange] < 0.2:
-                                    dimensionToChange = 2
-                                    if size[dimensionToChange] < 0.2:
-                                        print('All dimensions small')
-                                        noSpaceFlag = True
-                                        break
-                            size[dimensionToChange] -= 0.05
-                            # print("Dimension: " + str(dimensionToChange) + "Size: " + str(size[dimensionToChange]))
-                            if (dimensionToChange == abs(direction) - 1):
-                                pos[abs(direction) - 1] = size[abs(direction) - 1]/2 * (direction / abs(direction))
-                            dim1min = self.lastAbsolutePos[self.nextLinkID][axis] + pos[axis] - abs(size[axis] / 2)
-                            dim1max = self.lastAbsolutePos[self.nextLinkID][axis] + pos[axis] + abs(size[axis] / 2)
-                            dim2min = self.lastAbsolutePos[self.nextLinkID][(axis + 1) % 3] + pos[(axis + 1) % 3] - abs(size[(axis + 1) % 3] / 2)
-                            dim2max = self.lastAbsolutePos[self.nextLinkID][(axis + 1) % 3] + pos[(axis + 1) % 3] + abs(size[(axis + 1) % 3] / 2)
-                            dim3min = self.lastAbsolutePos[self.nextLinkID][(axis + 2) % 3] + pos[(axis + 2) % 3] - abs(size[(axis + 2) % 3] / 2)
-                            dim3max = self.lastAbsolutePos[self.nextLinkID][(axis + 2) % 3] + pos[(axis + 2) % 3] + abs(size[(axis + 2) % 3] / 2)
+                            noSpaceFlag = True
+                            break
+                            # dimensionToChange = 0
+                            # if size[dimensionToChange] < 0.2:
+                            #     dimensionToChange = 1
+                            #     if size[dimensionToChange] < 0.2:
+                            #         dimensionToChange = 2
+                            #         if size[dimensionToChange] < 0.2:
+                            #             print('All dimensions small')
+                            #             noSpaceFlag = True
+                            #             break
+                            # size[dimensionToChange] -= 0.05
+                            # # print("Dimension: " + str(dimensionToChange) + "Size: " + str(size[dimensionToChange]))
+                            # if (dimensionToChange == abs(direction) - 1):
+                            #     pos[abs(direction) - 1] = size[abs(direction) - 1]/2 * (direction / abs(direction))
+                            # dim1min = self.lastAbsolutePos[self.nextLinkID][axis] + pos[axis] - abs(size[axis] / 2)
+                            # dim1max = self.lastAbsolutePos[self.nextLinkID][axis] + pos[axis] + abs(size[axis] / 2)
+                            # dim2min = self.lastAbsolutePos[self.nextLinkID][(axis + 1) % 3] + pos[(axis + 1) % 3] - abs(size[(axis + 1) % 3] / 2)
+                            # dim2max = self.lastAbsolutePos[self.nextLinkID][(axis + 1) % 3] + pos[(axis + 1) % 3] + abs(size[(axis + 1) % 3] / 2)
+                            # dim3min = self.lastAbsolutePos[self.nextLinkID][(axis + 2) % 3] + pos[(axis + 2) % 3] - abs(size[(axis + 2) % 3] / 2)
+                            # dim3max = self.lastAbsolutePos[self.nextLinkID][(axis + 2) % 3] + pos[(axis + 2) % 3] + abs(size[(axis + 2) % 3] / 2)
                         else:
                             break
                     else:
