@@ -70,11 +70,13 @@ class SOLUTION:
             mutationProbability = random.random()
             # Add one link
             if mutationProbability < 0.5:
+                pass
 
         #Remove links
         else:
             # Remove one link
             if mutationProbability < 0.5:
+                pass
 
     def Set_ID(self, nextAvailableID):
         self.myID = nextAvailableID
