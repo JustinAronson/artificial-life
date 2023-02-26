@@ -20,6 +20,9 @@ class SOLUTION:
         self.occupiedSpace = []
         # Keep track of the absolute position of the last joint
         self.lastAbsolutePos = {}
+        # Keep track of all link data. Format:
+        # Format: key: link. Value: [parentID, depth, availableDirections, prevSize, prevDirection]
+        self.links = {}
 
     def Evaluate(self, directOrGUI):
         pass
@@ -59,6 +62,19 @@ class SOLUTION:
 
         column = random.randint(0, len(self.joints))
         self.weights[1][row][column] = random.random() * 2 - 1
+
+    def Mutate_Links(self):
+        mutationProbability = random.random()
+        #Add links
+        if random.random() < 0.5:
+            mutationProbability = random.random()
+            # Add one link
+            if mutationProbability < 0.5:
+
+        #Remove links
+        else:
+            # Remove one link
+            if mutationProbability < 0.5:
 
     def Set_ID(self, nextAvailableID):
         self.myID = nextAvailableID
@@ -135,38 +151,9 @@ class SOLUTION:
     # (turn back on themselves). Keep going until a certain depth is reached
 
     def Create_Link_Tree(self, parentID, depth, availableDirections, prevSize, prevDirection):
-        directions = availableDirections.copy()
-        size = [x / 2 for x in random.sample(range(1, 10), 3)]
-        direction = random.choice(directions)
-        pos = [0, 0, 0]
-
-        # While size is within position from previous links, shrink link
-
-        # Shift the block from joint in the direction chosen. Multiply size by -1 if direction is negative
-        pos[abs(direction) - 1] = size[abs(direction) - 1]/2 * (direction / abs(direction))
-
-        jointPos = [0, 0, 0]
-        if depth == 1:
-            jointPos[2] = 1
-            jointPos[abs(direction) - 1] += prevSize[abs(direction) - 1] / 2 * (direction / abs(direction))
-        else:
-            jointPos[abs(prevDirection) - 1] = prevSize[abs(prevDirection) - 1] / 2 * (prevDirection / abs(prevDirection))
-            jointPos[abs(direction) - 1] += prevSize[abs(direction) - 1] / 2 * (direction / abs(direction))
-
-        # Update the last position
-        self.lastAbsolutePos[self.nextLinkID] = [0, 0, 0]
-        for axis in range(0, len(jointPos)):
-            self.lastAbsolutePos[self.nextLinkID][axis] = self.lastAbsolutePos[parentID][axis] + jointPos[axis]
-
-        pos, size, noSpaceFlag = self.Check_For_Intersections(pos, size, direction)
-
+        pos, size, direction, directions, jointPos, noSpaceFlag = self.Set_Link_Stats(parentID, depth, availableDirections, prevSize, prevDirection)
         if noSpaceFlag:
             return
-
-        # Prevent the link tree from doubling back on itself
-        if -1 * direction in directions:
-            directions.remove(-1 * direction)
-
         # Last link in the tree. Base case.
         if depth == c.maxDepth:
             # If no links are sensor links, make end link a sensor. Otherwise, make the link a sensor 50% of the time
@@ -197,7 +184,38 @@ class SOLUTION:
 
             # self.Create_Link_Tree(self.nextLinkID-1, depth + 1, directions, size, direction)
 
-        
+    def Set_Link_Stats(self, parentID, depth, availableDirections, prevSize, prevDirection):
+        directions = availableDirections.copy()
+        size = [x / 2 for x in random.sample(range(1, 10), 3)]
+        direction = random.choice(directions)
+        pos = [0, 0, 0]
+
+        # While size is within position from previous links, shrink link
+
+        # Shift the block from joint in the direction chosen. Multiply size by -1 if direction is negative
+        pos[abs(direction) - 1] = size[abs(direction) - 1]/2 * (direction / abs(direction))
+
+        jointPos = [0, 0, 0]
+        if depth == 1:
+            jointPos[2] = 1
+            jointPos[abs(direction) - 1] += prevSize[abs(direction) - 1] / 2 * (direction / abs(direction))
+        else:
+            jointPos[abs(prevDirection) - 1] = prevSize[abs(prevDirection) - 1] / 2 * (prevDirection / abs(prevDirection))
+            jointPos[abs(direction) - 1] += prevSize[abs(direction) - 1] / 2 * (direction / abs(direction))
+
+        # Update the last position
+        self.lastAbsolutePos[self.nextLinkID] = [0, 0, 0]
+        for axis in range(0, len(jointPos)):
+            self.lastAbsolutePos[self.nextLinkID][axis] = self.lastAbsolutePos[parentID][axis] + jointPos[axis]
+
+        pos, size, noSpaceFlag = self.Check_For_Intersections(pos, size, direction)
+
+        # Prevent the link tree from doubling back on itself
+        if (-1 * direction in directions) and (not noSpaceFlag):
+            directions.remove(-1 * direction)
+
+        return pos, size, direction, directions, jointPos, noSpaceFlag
+
     def Check_For_Intersections(self, pos, size, direction):
         noSpaceFlag = False
         for linkSpace in self.occupiedSpace:
