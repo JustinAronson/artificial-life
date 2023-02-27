@@ -20,7 +20,7 @@ class SOLUTION:
         # Keep track of the absolute position of the last joint
         self.lastAbsolutePos = {}
         # Create body plan
-        # Format: array of links. Each link is an array of: ID, parentID, pos, size, colorName, availableDirections, direction
+        # Format: array of links. Each link is an array of: ID, parentID, pos, size, colorName, availableDirections, direction, depth
         self.linkPlan = []
         # Format: array of joints. Each joint is an array of: parentID, childID, pos
         self.jointPlan = []
@@ -81,39 +81,37 @@ class SOLUTION:
         self.Mutate_Links()
 
     def Mutate_Links(self):
-        mutationProbability = random.random()
         #Add links
         if random.random() < 0.5:
-            mutationProbability = random.random()
-            # Add one link
-            if mutationProbability < 0.6:
-                depth = c.maxDepth - 1
-            elif mutationProbability < 0.9:
-                depth = c.maxDepth - 2
-            else:
-                depth = c.maxDepth - 3
-            linkToAdd = random.choice(self.linkPlan)
-
-            # Choose a link with open faces. This will never become an infinite loop because
-            # there will always be a link at the end of the tree
-            while len(linkToAdd[5]) == 0:
-                linkToAdd = random.choice(self.linkPlan)
-
-            # parentSize = [0, 0, 0]
-            # parentDirection = 0
-            # for link in self.linkPlan:
-            #     if link[0] == linkToAdd[1]:
-            #         parentSize = link[3]
-            #         parentDirection = link[6]
-
-            self.Create_Link_Tree(linkToAdd[0], depth, linkToAdd[5], linkToAdd[3], linkToAdd[6])
-
+            self.Add_Links()
 
         #Remove links
         else:
             # Remove one link
-            if mutationProbability < 0.5:
-                pass
+            linksWithoutChildren = []
+            for link in self.linkPlan:
+                if link[7] == c.maxDepth:
+
+    # Mutation to add links to creature
+    def Add_Links(self):
+        mutationProbability = random.random()
+        # Add one link
+        if mutationProbability < 0.6:
+            depth = c.maxDepth - 1
+        # Add two links
+        elif mutationProbability < 0.9:
+            depth = c.maxDepth - 2
+        # Add three links
+        else:
+            depth = c.maxDepth - 3
+        linkToAdd = random.choice(self.linkPlan)
+
+        # Choose a link with open faces. This will never become an infinite loop because
+        # there will always be a link at the end of the tree
+        while len(linkToAdd[5]) == 0:
+            linkToAdd = random.choice(self.linkPlan)
+
+        self.Create_Link_Tree(linkToAdd[0], depth, linkToAdd[5], linkToAdd[3], linkToAdd[6])
 
     def Set_ID(self, nextAvailableID):
         self.myID = nextAvailableID
@@ -155,11 +153,11 @@ class SOLUTION:
 
         if random.random() < 0.5:
             # pyrosim.Send_Cube(name = "0", pos = [0, 0, 1], size = size, colorName = 'green')
-            self.linkPlan.append([0, None, pos, size, 'green', [-2, -1, 1, 2, 3], None])
+            self.linkPlan.append([0, None, pos, size, 'green', [-2, -1, 1, 2, 3], None], 0)
             self.sensorIDs.append(0)
         else:
             # pyrosim.Send_Cube(name = "0", pos = [0, 0, 1], size = size, colorName = 'blue')
-            self.linkPlan.append([0, None, pos, size, 'blue', [-2, -1, 1, 2, 3], None])
+            self.linkPlan.append([0, None, pos, size, 'blue', [-2, -1, 1, 2, 3], None], 0)
         
         self.lastAbsolutePos[0] = [0, 0, 0]
         # Update the space that the links occupy
@@ -191,10 +189,10 @@ class SOLUTION:
         # If no links are sensor links, make end link a sensor. Otherwise, make the link a sensor 50% of the time   
         if (random.random() < 0.5) or (depth == c.maxDepth and (len(self.sensorIDs) == 0)):
             # self.Create_Random_Link(parentID, self.nextLinkID, pos, size, 'green', jointPos)
-            self.linkPlan.append([self.nextLinkID, parentID, pos, size, 'green', directions, direction])
+            self.linkPlan.append([self.nextLinkID, parentID, pos, size, 'green', directions, direction, depth])
         else:
             # self.Create_Random_Link(parentID, self.nextLinkID, pos, size, 'blue', jointPos)
-            self.linkPlan.append([self.nextLinkID, parentID, pos, size, 'blue', directions, direction])
+            self.linkPlan.append([self.nextLinkID, parentID, pos, size, 'blue', directions, direction, depth])
 
 
         self.jointPlan.append([parentID, self.nextLinkID, jointPos])
