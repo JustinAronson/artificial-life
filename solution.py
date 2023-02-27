@@ -90,14 +90,39 @@ class SOLUTION:
         self.Mutate_Links()
 
     def Mutate_Links(self):
-        #Add links
-        if random.random() < 0.5:
+        mutationProbability = random.random()
+        # 10% chance to add links
+        if mutationProbability < 0.1:
             self.Add_Links()
 
-        #Remove links
-        else:
-#            self.Remove_Links()
-            pass
+        # 10% to remove links
+        elif mutationProbability < 0.2:
+            # If there two or fewer links, do not remove
+            if len(self.linkPlan) > 2:
+                print('Going into remove links')
+                self.Remove_Links()
+
+        # 20% chance to add sensor link
+        elif mutationProbability < 0.4:
+            print('Adding sensor')
+            self.Switch_Sensor_Status('blue', 'green')
+
+        # 20% chance to remove a sensor link
+        elif mutationProbability < 0.6:
+            print('Removing sensor')
+            self.Switch_Sensor_Status('green', 'blue')
+
+    def Switch_Sensor_Status(self, currentColor, newColor):
+        swappableLinks = []
+        linkIndex = 0
+        while linkIndex < len(self.linkPlan):
+            if self.linkPlan[linkIndex][4] == currentColor:
+                swappableLinks.append(linkIndex)
+            linkIndex += 1
+
+        if len(swappableLinks) > 0:
+            linkToChange = random.choice(swappableLinks)
+            self.linkPlan[linkToChange][4] = newColor        
             
     def Remove_Links(self):
         # Remove one link
@@ -115,16 +140,25 @@ class SOLUTION:
         if len(linksWithoutChildren) == 0:
             return
 
-        parent = []
-        for link in self.linkPlan:
-            if link[0] == linkToRemove[1]:
-                parent = link
+        # parent = []
+        # for link in self.linkPlan:
+        #     if link[0] == linkToRemove[1]:
+        #         parent = link
 
         linkToRemove = random.choice(linksWithoutChildren)
+        print('Removing link :')
+        print(linkToRemove)
+
         self.linkPlan.remove(linkToRemove)
 
         for joint in self.jointPlan:
-            if joint[0] == parent[0] and joint[1] == linkToRemove[0]:
+            # if joint[0] == parent[0] and joint[1] == linkToRemove[0]:
+            if joint[1] == linkToRemove[0]:
+                print('Removing joint : ')
+                print(joint)
+                # Remove the joint from weights
+                del self.motorWeights[self.jointPlan.index(joint)]
+
                 self.jointPlan.remove(joint)
 
     # Mutation to add links to creature
@@ -136,10 +170,10 @@ class SOLUTION:
             numToAdd = 1
         # Add two links
         elif mutationProbability < 0.9:
-            numToAdd = 1
+            numToAdd = 2
         # Add three links
         else:
-            numToAdd = 1
+            numToAdd = 3
         linkToAdd = random.choice(self.linkPlan)
 
         # Choose a link with open faces. This will never become an infinite loop because
@@ -283,7 +317,7 @@ class SOLUTION:
 
     def Set_Link_Stats(self, parentID, availableDirections, prevSize, prevDirection):
         directions = availableDirections.copy()
-        size = [x / 2 for x in random.sample(range(1, 10), 3)]
+        size = [random.randrange(1, 5), random.randrange(1, 5), random.randrange(1, 5)]
         if len(directions) == 0:
             noSpaceFlag = True
             return None, None, None, None, None, noSpaceFlag
@@ -393,12 +427,10 @@ class SOLUTION:
             #     pyrosim.Send_Motor_Neuron( name = id , jointName = str(id) + "_" + str(id + 1))
 
         sensorIndex = 0
-        print("Sensors: ")
-        print(self.sensors)
         self.sensors = []
         for link in self.linkPlan:
             if link[4] == 'green':
-                pyrosim.Send_Sensor_Neuron(name = sensorIndex + len(self.joints) + self.numHiddenNeurons , linkName = str(link[0]))
+                pyrosim.Send_Sensor_Neuron(name = sensorIndex + len(self.jointPlan) + self.numHiddenNeurons , linkName = str(link[0]))
                 # self.sensors.append(link[0])       
                 # sensorIndex += 1
                 if link[0] not in self.sensorWeights:
@@ -408,52 +440,28 @@ class SOLUTION:
 
                 for i in range(0, self.numHiddenNeurons):
                     hiddenNeuronName = len(self.joints) + i
-                    pyrosim.Send_Synapse( sourceNeuronName = sensorIndex + len(self.joints) + self.numHiddenNeurons , targetNeuronName = hiddenNeuronName , weight = self.sensorWeights[link[0]][i] )
+                    pyrosim.Send_Synapse( sourceNeuronName = sensorIndex + len(self.jointPlan) + self.numHiddenNeurons , targetNeuronName = hiddenNeuronName , weight = self.sensorWeights[link[0]][i] )
 
                 self.sensors.append(link[0])     
                 sensorIndex += 1
+            
+        print("Sensors: ")
+        print(self.sensors)
 
-        for joint in self.joints:
-            pyrosim.Send_Motor_Neuron( name = self.joints.index(joint) , jointName = str(joint[0]) + "_" + str(joint[1]))
+        for joint in self.jointPlan:
+            pyrosim.Send_Motor_Neuron( name = self.jointPlan.index(joint) , jointName = str(joint[0]) + "_" + str(joint[1]))
 
             # Will need to be changed if deleting links for evolution
-            if self.joints.index(joint) not in self.motorWeights:
-                self.motorWeights[self.joints.index(joint)] = []
+            if self.jointPlan.index(joint) not in self.motorWeights:
+                self.motorWeights[self.jointPlan.index(joint)] = []
                 for i in range(0, self.numHiddenNeurons):
-                    self.motorWeights[self.joints.index(joint)].append(random.random() * 2 - 1)
+                    self.motorWeights[self.jointPlan.index(joint)].append(random.random() * 2 - 1)
 
             for i in range(0, self.numHiddenNeurons):
                 hiddenNeuronName = len(self.joints) + i
-                pyrosim.Send_Synapse( sourceNeuronName = hiddenNeuronName , targetNeuronName = self.joints.index(joint) , weight = self.motorWeights[self.joints.index(joint)][i] )
+                pyrosim.Send_Synapse( sourceNeuronName = hiddenNeuronName , targetNeuronName = self.jointPlan.index(joint) , weight = self.motorWeights[self.jointPlan.index(joint)][i] )
 
         for hiddenNeuronID in range(0, self.numHiddenNeurons):
-            pyrosim.Send_Hidden_Neuron(name = len(self.joints) + hiddenNeuronID)
-
-    #   DELETE. WILL OVERWRITE BRAIN EVOLUTION
-        # self.weights = [np.random.rand(numHiddenNeurons, len(self.sensorIDs)), np.random.rand(numHiddenNeurons, len(self.joints))]
-        # self.weights[0] = self.weights[0] * 2 - 1
-        # self.weights[1] = self.weights[1] * 2 - 1
-
-        # print('Sensor shape: ')
-        # print(self.weights[0].shape)
-        # print('Motor shape: ')
-        # print(self.weights[1].shape)
-        # print('')
-
-        # print("Num hidden neurons: " + str(self.numHiddenNeurons))
-        # print("Sensors: ")
-        # print(self.sensors)
-        # for currentRow in range(0, self.numHiddenNeurons):
-        #     for currentColumn in range(0, len(self.sensors)):
-        #             sensorName = currentColumn + len(self.joints) + self.numHiddenNeurons
-        #             hiddenNeuronName = len(self.joints) + currentRow
-        #             pyrosim.Send_Synapse( sourceNeuronName = sensorName , targetNeuronName = hiddenNeuronName , weight = self.weights[0][currentRow][currentColumn] )
-
-        # for currentRow in range(0, self.numHiddenNeurons):
-        #     for currentColumn in range(0, len(self.joints)):
-        #             motorName = currentColumn
-        #             hiddenNeuronName = len(self.joints) + currentRow
-        #             pyrosim.Send_Synapse( sourceNeuronName = hiddenNeuronName , targetNeuronName = motorName , weight = self.weights[1][currentRow][currentColumn] )
-
+            pyrosim.Send_Hidden_Neuron(name = len(self.jointPlan) + hiddenNeuronID)
 
         pyrosim.End()
