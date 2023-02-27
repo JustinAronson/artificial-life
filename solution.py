@@ -34,14 +34,19 @@ class SOLUTION:
         # Called on the first generation of robots.
         self.Create_Body_Plan()
 
-        self.weights = [np.random.rand(self.numHiddenNeurons, len(self.sensors)), np.random.rand(self.numHiddenNeurons, len(self.joints))]
-        self.weights[0] = self.weights[0] * 2 - 1
-        self.weights[1] = self.weights[1] * 2 - 1
-        print('Sensor shape: ')
-        print(self.weights[0].shape)
-        print('Motor shape: ')
-        print(self.weights[1].shape)
-        print('')
+        # self.weights = [np.random.rand(self.numHiddenNeurons, len(self.sensors)), np.random.rand(self.numHiddenNeurons, len(self.joints))]
+        # self.weights[0] = self.weights[0] * 2 - 1
+        # self.weights[1] = self.weights[1] * 2 - 1
+
+        # print('Sensor shape: ')
+        # print(self.weights[0].shape)
+        # print('Motor shape: ')
+        # print(self.weights[1].shape)
+        # print('')
+
+        self.sensorWeights = {}
+        self.motorWeights = {}
+
 
 
     def Evaluate(self, directOrGUI):
@@ -76,13 +81,11 @@ class SOLUTION:
         print("Sensors: ")
         print(self.sensors)
 
-        row = random.randint(0, self.numHiddenNeurons - 1)
-        column = self.sensors.index(random.choice(self.sensors))
+        sensorToChange = random.choice(self.sensors)
+        self.sensorWeights[sensorToChange][random.randint(0, self.numHiddenNeurons - 1)] = random.random() * 2 - 1
 
-        self.weights[0][row][column] = random.random() * 2 - 1
-
-        column = random.randint(0, len(self.joints) - 1)
-        self.weights[1][row][column] = random.random() * 2 - 1
+        motorToChange = random.choice(self.joints)
+        self.motorWeights[self.joints.index(motorToChange)][random.randint(0, self.numHiddenNeurons - 1)] = random.random() * 2 - 1
 
         self.Mutate_Links()
 
@@ -146,18 +149,18 @@ class SOLUTION:
 
         self.Create_Link_Tree(linkToAdd[0], c.maxDepth - numToAdd, linkToAdd[5], linkToAdd[3], linkToAdd[6])
 
-        child = []
-        for link in self.linkPlan:
-            if link[1] == linkToAdd[0]:
-                child = link
+        # child = []
+        # for link in self.linkPlan:
+        #     if link[1] == linkToAdd[0]:
+        #         child = link
         
-        if child[4] == 'green':
-            print('self.weights before adding:')
-            print(self.weights[0].shape)
-            # self.weights[0].append(np.random.rand(self.numHiddenNeurons, numToAdd))
-            self.weights[0] = np.append(self.weights[0], np.random.rand(self.numHiddenNeurons, numToAdd), axis=1)
-            print('self.weights after adding:')
-            print(self.weights[0].shape)
+        # if child[4] == 'green':
+            # print('self.weights before adding:')
+            # print(self.weights[0].shape)
+            # # self.weights[0].append(np.random.rand(self.numHiddenNeurons, numToAdd))
+            # self.weights[0] = np.append(self.weights[0], np.random.rand(self.numHiddenNeurons, numToAdd), axis=1)
+            # print('self.weights after adding:')
+            # print(self.weights[0].shape)
 
     def Set_ID(self, nextAvailableID):
         self.myID = nextAvailableID
@@ -396,11 +399,32 @@ class SOLUTION:
         for link in self.linkPlan:
             if link[4] == 'green':
                 pyrosim.Send_Sensor_Neuron(name = sensorIndex + len(self.joints) + self.numHiddenNeurons , linkName = str(link[0]))
-                self.sensors.append(link[0])       
-                sensorIndex += 1     
+                # self.sensors.append(link[0])       
+                # sensorIndex += 1
+                if link[0] not in self.sensorWeights:
+                    self.sensorWeights[link[0]] = []
+                    for i in range(0, self.numHiddenNeurons):
+                        self.sensorWeights[link[0]].append(random.random() * 2 - 1)
+
+                for i in range(0, self.numHiddenNeurons):
+                    hiddenNeuronName = len(self.joints) + i
+                    pyrosim.Send_Synapse( sourceNeuronName = sensorIndex + len(self.joints) + self.numHiddenNeurons , targetNeuronName = hiddenNeuronName , weight = self.sensorWeights[link[0]][i] )
+
+                self.sensors.append(link[0])     
+                sensorIndex += 1
 
         for joint in self.joints:
             pyrosim.Send_Motor_Neuron( name = self.joints.index(joint) , jointName = str(joint[0]) + "_" + str(joint[1]))
+
+            # Will need to be changed if deleting links for evolution
+            if self.joints.index(joint) not in self.motorWeights:
+                self.motorWeights[self.joints.index(joint)] = []
+                for i in range(0, self.numHiddenNeurons):
+                    self.motorWeights[self.joints.index(joint)].append(random.random() * 2 - 1)
+
+            for i in range(0, self.numHiddenNeurons):
+                hiddenNeuronName = len(self.joints) + i
+                pyrosim.Send_Synapse( sourceNeuronName = hiddenNeuronName , targetNeuronName = self.joints.index(joint) , weight = self.motorWeights[self.joints.index(joint)][i] )
 
         for hiddenNeuronID in range(0, self.numHiddenNeurons):
             pyrosim.Send_Hidden_Neuron(name = len(self.joints) + hiddenNeuronID)
@@ -410,26 +434,26 @@ class SOLUTION:
         # self.weights[0] = self.weights[0] * 2 - 1
         # self.weights[1] = self.weights[1] * 2 - 1
 
-        print('Sensor shape: ')
-        print(self.weights[0].shape)
-        print('Motor shape: ')
-        print(self.weights[1].shape)
-        print('')
+        # print('Sensor shape: ')
+        # print(self.weights[0].shape)
+        # print('Motor shape: ')
+        # print(self.weights[1].shape)
+        # print('')
 
-        print("Num hidden neurons: " + str(self.numHiddenNeurons))
-        print("Sensors: ")
-        print(self.sensors)
-        for currentRow in range(0, self.numHiddenNeurons):
-            for currentColumn in range(0, len(self.sensors)):
-                    sensorName = currentColumn + len(self.joints) + self.numHiddenNeurons
-                    hiddenNeuronName = len(self.joints) + currentRow
-                    pyrosim.Send_Synapse( sourceNeuronName = sensorName , targetNeuronName = hiddenNeuronName , weight = self.weights[0][currentRow][currentColumn] )
+        # print("Num hidden neurons: " + str(self.numHiddenNeurons))
+        # print("Sensors: ")
+        # print(self.sensors)
+        # for currentRow in range(0, self.numHiddenNeurons):
+        #     for currentColumn in range(0, len(self.sensors)):
+        #             sensorName = currentColumn + len(self.joints) + self.numHiddenNeurons
+        #             hiddenNeuronName = len(self.joints) + currentRow
+        #             pyrosim.Send_Synapse( sourceNeuronName = sensorName , targetNeuronName = hiddenNeuronName , weight = self.weights[0][currentRow][currentColumn] )
 
-        for currentRow in range(0, self.numHiddenNeurons):
-            for currentColumn in range(0, len(self.joints)):
-                    motorName = currentColumn
-                    hiddenNeuronName = len(self.joints) + currentRow
-                    pyrosim.Send_Synapse( sourceNeuronName = hiddenNeuronName , targetNeuronName = motorName , weight = self.weights[1][currentRow][currentColumn] )
+        # for currentRow in range(0, self.numHiddenNeurons):
+        #     for currentColumn in range(0, len(self.joints)):
+        #             motorName = currentColumn
+        #             hiddenNeuronName = len(self.joints) + currentRow
+        #             pyrosim.Send_Synapse( sourceNeuronName = hiddenNeuronName , targetNeuronName = motorName , weight = self.weights[1][currentRow][currentColumn] )
 
 
         pyrosim.End()
