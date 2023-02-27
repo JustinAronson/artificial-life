@@ -20,7 +20,7 @@ class SOLUTION:
         # Keep track of the absolute position of the last joint
         self.lastAbsolutePos = {}
         # Create body plan
-        # Format: array of links. Each link is an array of: ID, parentID, pos, size, colorName
+        # Format: array of links. Each link is an array of: ID, parentID, pos, size, colorName, availableDirections, direction
         self.linkPlan = []
         # Format: array of joints. Each joint is an array of: parentID, childID, pos
         self.jointPlan = []
@@ -78,14 +78,36 @@ class SOLUTION:
         column = random.randint(0, len(self.joints) - 1)
         self.weights[1][row][column] = random.random() * 2 - 1
 
+        self.Mutate_Links()
+
     def Mutate_Links(self):
         mutationProbability = random.random()
         #Add links
         if random.random() < 0.5:
             mutationProbability = random.random()
             # Add one link
-            if mutationProbability < 0.5:
-                pass
+            if mutationProbability < 0.6:
+                depth = c.maxDepth - 1
+            elif mutationProbability < 0.9:
+                depth = c.maxDepth - 2
+            else:
+                depth = c.maxDepth - 3
+            linkToAdd = random.choice(self.linkPlan)
+
+            # Choose a link with open faces. This will never become an infinite loop because
+            # there will always be a link at the end of the tree
+            while len(linkToAdd[5]) == 0:
+                linkToAdd = random.choice(self.linkPlan)
+
+            # parentSize = [0, 0, 0]
+            # parentDirection = 0
+            # for link in self.linkPlan:
+            #     if link[0] == linkToAdd[1]:
+            #         parentSize = link[3]
+            #         parentDirection = link[6]
+
+            self.Create_Link_Tree(linkToAdd[0], depth, linkToAdd[5], linkToAdd[3], linkToAdd[6])
+
 
         #Remove links
         else:
@@ -133,11 +155,11 @@ class SOLUTION:
 
         if random.random() < 0.5:
             # pyrosim.Send_Cube(name = "0", pos = [0, 0, 1], size = size, colorName = 'green')
-            self.linkPlan.append([0, None, pos, size, 'green'])
+            self.linkPlan.append([0, None, pos, size, 'green', [-2, -1, 1, 2, 3], None])
             self.sensorIDs.append(0)
         else:
             # pyrosim.Send_Cube(name = "0", pos = [0, 0, 1], size = size, colorName = 'blue')
-            self.linkPlan.append([0, None, pos, size, 'blue'])
+            self.linkPlan.append([0, None, pos, size, 'blue', [-2, -1, 1, 2, 3], None])
         
         self.lastAbsolutePos[0] = [0, 0, 0]
         # Update the space that the links occupy
@@ -162,17 +184,17 @@ class SOLUTION:
     # Recursivley create links. Keep track of the direction that the link 'trees' have taken from the origin. They cannot go back in the same direction
     # (turn back on themselves). Keep going until a certain depth is reached
     def Create_Link_Tree(self, parentID, depth, availableDirections, prevSize, prevDirection):
-        pos, size, direction, directions, jointPos, noSpaceFlag = self.Set_Link_Stats(parentID, depth, availableDirections, prevSize, prevDirection)
+        pos, size, direction, directions, jointPos, noSpaceFlag = self.Set_Link_Stats(parentID, availableDirections, prevSize, prevDirection)
         if noSpaceFlag:
             return
 
         # If no links are sensor links, make end link a sensor. Otherwise, make the link a sensor 50% of the time   
         if (random.random() < 0.5) or (depth == c.maxDepth and (len(self.sensorIDs) == 0)):
             # self.Create_Random_Link(parentID, self.nextLinkID, pos, size, 'green', jointPos)
-            self.linkPlan.append([self.nextLinkID, parentID, pos, size, 'green'])
+            self.linkPlan.append([self.nextLinkID, parentID, pos, size, 'green', directions, direction])
         else:
             # self.Create_Random_Link(parentID, self.nextLinkID, pos, size, 'blue', jointPos)
-            self.linkPlan.append([self.nextLinkID, parentID, pos, size, 'blue'])
+            self.linkPlan.append([self.nextLinkID, parentID, pos, size, 'blue', directions, direction])
 
 
         self.jointPlan.append([parentID, self.nextLinkID, jointPos])
@@ -186,6 +208,11 @@ class SOLUTION:
         self.occupiedSpace.append(space)
 
         self.joints.append([parentID, self.nextLinkID])
+
+        # Update available directions for parent
+        for link in self.linkPlan:
+            if link[0] == parentID:
+                link[5].remove(direction)
 
         self.nextLinkID += 1
 
@@ -207,9 +234,12 @@ class SOLUTION:
 
             # self.Create_Link_Tree(self.nextLinkID-1, depth + 1, directions, size, direction)
 
-    def Set_Link_Stats(self, parentID, depth, availableDirections, prevSize, prevDirection):
+    def Set_Link_Stats(self, parentID, availableDirections, prevSize, prevDirection):
         directions = availableDirections.copy()
         size = [x / 2 for x in random.sample(range(1, 10), 3)]
+        if len(directions) == 0:
+            noSpaceFlag = True
+            return None, None, None, None, None, noSpaceFlag
         direction = random.choice(directions)
         pos = [0, 0, 0]
 
@@ -219,9 +249,9 @@ class SOLUTION:
         pos[abs(direction) - 1] = size[abs(direction) - 1]/2 * (direction / abs(direction))
 
         jointPos = [0, 0, 0]
-        if depth == 1:
+        if parentID == 0:
             jointPos[2] = 1
-            jointPos[abs(direction) - 1] += prevSize[abs(direction) - 1] / 2 * (direction / abs(direction))
+            jointPos[abs(direction) - 1] += self.linkPlan[0][3][abs(direction) - 1] / 2 * (direction / abs(direction))
         else:
             jointPos[abs(prevDirection) - 1] = prevSize[abs(prevDirection) - 1] / 2 * (prevDirection / abs(prevDirection))
             jointPos[abs(direction) - 1] += prevSize[abs(direction) - 1] / 2 * (direction / abs(direction))
