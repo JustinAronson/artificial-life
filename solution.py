@@ -37,6 +37,12 @@ class SOLUTION:
         self.weights = [np.random.rand(self.numHiddenNeurons, len(self.sensors)), np.random.rand(self.numHiddenNeurons, len(self.joints))]
         self.weights[0] = self.weights[0] * 2 - 1
         self.weights[1] = self.weights[1] * 2 - 1
+        print('Sensor shape: ')
+        print(self.weights[0].shape)
+        print('Motor shape: ')
+        print(self.weights[1].shape)
+        print('')
+
 
     def Evaluate(self, directOrGUI):
         pass
@@ -87,47 +93,50 @@ class SOLUTION:
 
         #Remove links
         else:
-            # Remove one link
-            linksWithoutChildren = []
-            for link in self.linkPlan:
-                hasChildren = False
-                for child in self.linkPlan:
-                    if child[1] == link[0]:
-                        hasChildren = True
-                        break
-                if not hasChildren:
-                    linksWithoutChildren.append(link)
-
-            # If there are no links without children, return (should never happen)
-            if len(linksWithoutChildren) == 0:
-                return
-
-            parent = []
-            for link in self.linkPlan:
-                if link[0] == linkToRemove[1]:
-                    parent = link
-
-            linkToRemove = random.choice(linksWithoutChildren)
-            self.linkPlan.remove(linkToRemove)
-
-            for joint in self.jointPlan:
-                if joint[0] == parent[0] and joint[1] == linkToRemove[0]:
-                    self.jointPlan.remove(joint)
+#            self.Remove_Links()
+            pass
             
+    def Remove_Links(self):
+        # Remove one link
+        linksWithoutChildren = []
+        for link in self.linkPlan:
+            hasChildren = False
+            for child in self.linkPlan:
+                if child[1] == link[0]:
+                    hasChildren = True
+                    break
+            if not hasChildren:
+                linksWithoutChildren.append(link)
 
+        # If there are no links without children, return (should never happen)
+        if len(linksWithoutChildren) == 0:
+            return
+
+        parent = []
+        for link in self.linkPlan:
+            if link[0] == linkToRemove[1]:
+                parent = link
+
+        linkToRemove = random.choice(linksWithoutChildren)
+        self.linkPlan.remove(linkToRemove)
+
+        for joint in self.jointPlan:
+            if joint[0] == parent[0] and joint[1] == linkToRemove[0]:
+                self.jointPlan.remove(joint)
 
     # Mutation to add links to creature
     def Add_Links(self):
         mutationProbability = random.random()
+        numToAdd = 0
         # Add one link
         if mutationProbability < 0.6:
-            depth = c.maxDepth - 1
+            numToAdd = 1
         # Add two links
         elif mutationProbability < 0.9:
-            depth = c.maxDepth - 2
+            numToAdd = 1
         # Add three links
         else:
-            depth = c.maxDepth - 3
+            numToAdd = 1
         linkToAdd = random.choice(self.linkPlan)
 
         # Choose a link with open faces. This will never become an infinite loop because
@@ -135,7 +144,20 @@ class SOLUTION:
         while len(linkToAdd[5]) == 0:
             linkToAdd = random.choice(self.linkPlan)
 
-        self.Create_Link_Tree(linkToAdd[0], depth, linkToAdd[5], linkToAdd[3], linkToAdd[6])
+        self.Create_Link_Tree(linkToAdd[0], c.maxDepth - numToAdd, linkToAdd[5], linkToAdd[3], linkToAdd[6])
+
+        child = []
+        for link in self.linkPlan:
+            if link[1] == linkToAdd[0]:
+                child = link
+        
+        if child[4] == 'green':
+            print('self.weights before adding:')
+            print(self.weights[0].shape)
+            # self.weights[0].append(np.random.rand(self.numHiddenNeurons, numToAdd))
+            self.weights[0] = np.append(self.weights[0], np.random.rand(self.numHiddenNeurons, numToAdd), axis=1)
+            print('self.weights after adding:')
+            print(self.weights[0].shape)
 
     def Set_ID(self, nextAvailableID):
         self.myID = nextAvailableID
@@ -368,6 +390,8 @@ class SOLUTION:
             #     pyrosim.Send_Motor_Neuron( name = id , jointName = str(id) + "_" + str(id + 1))
 
         sensorIndex = 0
+        print("Sensors: ")
+        print(self.sensors)
         self.sensors = []
         for link in self.linkPlan:
             if link[4] == 'green':
@@ -386,6 +410,15 @@ class SOLUTION:
         # self.weights[0] = self.weights[0] * 2 - 1
         # self.weights[1] = self.weights[1] * 2 - 1
 
+        print('Sensor shape: ')
+        print(self.weights[0].shape)
+        print('Motor shape: ')
+        print(self.weights[1].shape)
+        print('')
+
+        print("Num hidden neurons: " + str(self.numHiddenNeurons))
+        print("Sensors: ")
+        print(self.sensors)
         for currentRow in range(0, self.numHiddenNeurons):
             for currentColumn in range(0, len(self.sensors)):
                     sensorName = currentColumn + len(self.joints) + self.numHiddenNeurons
