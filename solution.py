@@ -41,7 +41,8 @@ class SOLUTION:
         self.Create_Body()
         self.Create_Brain()
         # os.system("python3 simulate.py " + directOrGUI + " " + str(self.myID) + " 2&>1 &")
-        os.system("python3 simulate.py " + directOrGUI + " " + str(self.myID) + " &")
+        # os.system("python3 simulate.py " + directOrGUI + " " + str(self.myID) + " &")
+        os.system("python3 simulate.py " + directOrGUI + " " + str(self.myID))
 
     def Wait_For_Simulation_To_End(self):
         while not os.path.exists("fitness" + str(self.myID) + ".txt"):
@@ -55,12 +56,14 @@ class SOLUTION:
         print("Sensors: ")
         print(self.sensorIDs)
 
+        breakpoint()
+
         row = random.randint(0, c.numHiddenNeurons - 1)
         column = self.sensorIDs.index(random.choice(self.sensorIDs))
 
         self.weights[0][row][column] = random.random() * 2 - 1
 
-        column = random.randint(0, len(self.joints))
+        column = random.randint(0, len(self.joints) - 1)
         self.weights[1][row][column] = random.random() * 2 - 1
 
     def Mutate_Links(self):
@@ -114,7 +117,7 @@ class SOLUTION:
         size = [x / 10 for x in random.sample(range(1, 20), 3)]
         pos = [0, 0, 1]
 
-        pyrosim.Start_URDF("body.urdf")
+        pyrosim.Start_URDF("body" + str(self.myID) + ".urdf")
 
         self.sensorIDs = []
 
@@ -342,6 +345,7 @@ class SOLUTION:
         # pyrosim.Send_Synapse( sourceNeuronName = 1 , targetNeuronName = 3 , weight = -1.0 )
         # pyrosim.Send_Synapse( sourceNeuronName = 2 , targetNeuronName = 4 , weight = 1.0 )
 
+    #   DELETE. WILL OVERWRITE BRAIN EVOLUTION
         self.weights = [np.random.rand(numHiddenNeurons, len(self.sensorIDs)), np.random.rand(numHiddenNeurons, len(self.joints))]
         self.weights[0] = self.weights[0] * 2 - 1
         self.weights[1] = self.weights[1] * 2 - 1

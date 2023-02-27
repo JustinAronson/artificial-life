@@ -15,7 +15,7 @@ class ROBOT:
         self.Prepare_To_Sense()
         self.Prepare_To_Act()
         self.nn = NEURAL_NETWORK("brain" + solutionID + ".nndf")
-        os.system("rm brain" + str(solutionID) + ".nndf")
+        # os.system("rm brain" + str(solutionID) + ".nndf")
         self.solutionID = solutionID
         self.robotPositionDifference = 200
         self.boxPositionDifference = 200
@@ -40,8 +40,8 @@ class ROBOT:
                 jointName = self.nn.Get_Motor_Neurons_Joint(neuronName)
                 desiredAngle = self.nn.Get_Value_Of(neuronName)
                 desiredAngle *= c.motorJointRange
-                self.motors[bytes(jointName, 'utf-8')].Set_Value(self.robot, desiredAngle)  
-                 
+                # self.motors[bytes(jointName, 'utf-8')].Set_Value(self.robot, desiredAngle)  
+                self.motors[jointName].Set_Value(self.robot, desiredAngle)
 
     def Think(self):
         self.nn.Update()

@@ -7,7 +7,7 @@ amplitudeFront = numpy.pi/4
 frequencyFront = 6
 phaseOffsetFront = numpy.pi/4
 
-loopIterations = 80000
+loopIterations = 2000
 
 numberOfGenerations = 1
 populationSize = 1
