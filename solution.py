@@ -20,7 +20,7 @@ class SOLUTION:
         # Keep track of the absolute position of the last joint
         self.lastAbsolutePos = {}
         # Create body plan
-        # Format: array of links. Each link is an array of: ID, parentID, pos, size, colorName, availableDirections, direction, depth
+        # Format: array of links. Each link is an array of: ID, parentID, pos, size, colorName, availableDirections, direction
         self.linkPlan = []
         # Format: array of joints. Each joint is an array of: parentID, childID, pos
         self.jointPlan = []
@@ -90,7 +90,31 @@ class SOLUTION:
             # Remove one link
             linksWithoutChildren = []
             for link in self.linkPlan:
-                if link[7] == c.maxDepth:
+                hasChildren = False
+                for child in self.linkPlan:
+                    if child[1] == link[0]:
+                        hasChildren = True
+                        break
+                if not hasChildren:
+                    linksWithoutChildren.append(link)
+
+            # If there are no links without children, return (should never happen)
+            if len(linksWithoutChildren) == 0:
+                return
+
+            parent = []
+            for link in self.linkPlan:
+                if link[0] == linkToRemove[1]:
+                    parent = link
+
+            linkToRemove = random.choice(linksWithoutChildren)
+            self.linkPlan.remove(linkToRemove)
+
+            for joint in self.jointPlan:
+                if joint[0] == parent[0] and joint[1] == linkToRemove[0]:
+                    self.jointPlan.remove(joint)
+            
+
 
     # Mutation to add links to creature
     def Add_Links(self):
@@ -153,11 +177,11 @@ class SOLUTION:
 
         if random.random() < 0.5:
             # pyrosim.Send_Cube(name = "0", pos = [0, 0, 1], size = size, colorName = 'green')
-            self.linkPlan.append([0, None, pos, size, 'green', [-2, -1, 1, 2, 3], None], 0)
+            self.linkPlan.append([0, None, pos, size, 'green', [-2, -1, 1, 2, 3], None])
             self.sensorIDs.append(0)
         else:
             # pyrosim.Send_Cube(name = "0", pos = [0, 0, 1], size = size, colorName = 'blue')
-            self.linkPlan.append([0, None, pos, size, 'blue', [-2, -1, 1, 2, 3], None], 0)
+            self.linkPlan.append([0, None, pos, size, 'blue', [-2, -1, 1, 2, 3], None])
         
         self.lastAbsolutePos[0] = [0, 0, 0]
         # Update the space that the links occupy
@@ -189,10 +213,10 @@ class SOLUTION:
         # If no links are sensor links, make end link a sensor. Otherwise, make the link a sensor 50% of the time   
         if (random.random() < 0.5) or (depth == c.maxDepth and (len(self.sensorIDs) == 0)):
             # self.Create_Random_Link(parentID, self.nextLinkID, pos, size, 'green', jointPos)
-            self.linkPlan.append([self.nextLinkID, parentID, pos, size, 'green', directions, direction, depth])
+            self.linkPlan.append([self.nextLinkID, parentID, pos, size, 'green', directions, direction])
         else:
             # self.Create_Random_Link(parentID, self.nextLinkID, pos, size, 'blue', jointPos)
-            self.linkPlan.append([self.nextLinkID, parentID, pos, size, 'blue', directions, direction, depth])
+            self.linkPlan.append([self.nextLinkID, parentID, pos, size, 'blue', directions, direction])
 
 
         self.jointPlan.append([parentID, self.nextLinkID, jointPos])
