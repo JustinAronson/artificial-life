@@ -106,8 +106,6 @@ def Prepare_Joint_Dictionary(bodyID):
 
 def Prepare_To_Simulate(bodyID):
 
-    breakpoint()
-
     Prepare_Link_Dictionary(bodyID)
 
     Prepare_Joint_Dictionary(bodyID)

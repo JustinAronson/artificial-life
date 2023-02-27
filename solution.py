@@ -13,7 +13,6 @@ class SOLUTION:
         self.myID = nextAvailableID
         self.sensors = []
         # self.numLinks = random.randint(c.minLinks, c.maxLinks)
-        self.weights = []
         self.nextLinkID = 0
         self.joints = []
         # Keep track of the space that current links occupy. 3 dimensional array - links, dimensions, space occipied
@@ -29,9 +28,15 @@ class SOLUTION:
         # Keep track of all link data. Format:
         # Format: key: link. Value: [parentID, depth, availableDirections, prevSize, prevDirection]
         self.links = {}
+        # Could also be replaced with a random number of hidden neurons
+        self.numHiddenNeurons = c.numHiddenNeurons
 
         # Called on the first generation of robots.
         self.Create_Body_Plan()
+
+        self.weights = [np.random.rand(self.numHiddenNeurons, len(self.sensors)), np.random.rand(self.numHiddenNeurons, len(self.joints))]
+        self.weights[0] = self.weights[0] * 2 - 1
+        self.weights[1] = self.weights[1] * 2 - 1
 
     def Evaluate(self, directOrGUI):
         pass
@@ -63,11 +68,9 @@ class SOLUTION:
 
     def Mutate(self):
         print("Sensors: ")
-        print(self.sensorIDs)
+        print(self.sensors)
 
-        breakpoint()
-
-        row = random.randint(0, c.numHiddenNeurons - 1)
+        row = random.randint(0, self.numHiddenNeurons - 1)
         column = self.sensors.index(random.choice(self.sensors))
 
         self.weights[0][row][column] = random.random() * 2 - 1
@@ -150,9 +153,14 @@ class SOLUTION:
         # Don't let the robot go in the -z direction, so don't include -3 in directions
         self.Create_Link_Tree(0, 1, [-2, -1, 1, 2, 3], size, 3)
 
+        self.sensors = []
+        for link in self.linkPlan:
+            if link[4] == 'green':
+                self.sensors.append(link[0])       
+
+
     # Recursivley create links. Keep track of the direction that the link 'trees' have taken from the origin. They cannot go back in the same direction
     # (turn back on themselves). Keep going until a certain depth is reached
-
     def Create_Link_Tree(self, parentID, depth, availableDirections, prevSize, prevDirection):
         pos, size, direction, directions, jointPos, noSpaceFlag = self.Set_Link_Stats(parentID, depth, availableDirections, prevSize, prevDirection)
         if noSpaceFlag:
@@ -299,9 +307,6 @@ class SOLUTION:
         # pyrosim.Send_Sensor_Neuron(name = 1 , linkName = "FrontLowerLeg")
         # pyrosim.Send_Sensor_Neuron(name = 2 , linkName = "LeftLowerLeg")
         # pyrosim.Send_Sensor_Neuron(name = 3 , linkName = "RightLowerLeg")
-        
-        # Could also be replaced with a random number of hidden neurons
-        numHiddenNeurons = c.numHiddenNeurons
 
         # for id in range(0, self.nextLinkID):
         #     if id in self.sensorIDs:
@@ -314,48 +319,28 @@ class SOLUTION:
         self.sensors = []
         for link in self.linkPlan:
             if link[4] == 'green':
-                pyrosim.Send_Sensor_Neuron(name = sensorIndex + len(self.joints) + numHiddenNeurons , linkName = str(link[0]))
+                pyrosim.Send_Sensor_Neuron(name = sensorIndex + len(self.joints) + self.numHiddenNeurons , linkName = str(link[0]))
                 self.sensors.append(link[0])       
                 sensorIndex += 1     
 
         for joint in self.joints:
             pyrosim.Send_Motor_Neuron( name = self.joints.index(joint) , jointName = str(joint[0]) + "_" + str(joint[1]))
 
-
-        # pyrosim.Send_Motor_Neuron( name = 4 , jointName = "Torso_BackLeg")
-        # pyrosim.Send_Motor_Neuron( name = 5 , jointName = "Torso_FrontLeg")
-        # pyrosim.Send_Motor_Neuron( name = 6 , jointName = "Torso_LeftLeg")
-        # pyrosim.Send_Motor_Neuron( name = 7 , jointName = "Torso_RightLeg")
-        # pyrosim.Send_Motor_Neuron( name = 8 , jointName = "BackLeg_BackLowerLeg")
-        # pyrosim.Send_Motor_Neuron( name = 9 , jointName = "FrontLeg_FrontLowerLeg")
-        # pyrosim.Send_Motor_Neuron( name = 10 , jointName = "LeftLeg_LeftLowerLeg")
-        # pyrosim.Send_Motor_Neuron( name = 11 , jointName = "RightLeg_RightLowerLeg")
-
-        # pyrosim.Send_Hidden_Neuron(name = 12)
-        # pyrosim.Send_Hidden_Neuron(name = 13)
-        # pyrosim.Send_Hidden_Neuron(name = 14)
-        # pyrosim.Send_Hidden_Neuron(name = 15)
-
-        for hiddenNeuronID in range(0, numHiddenNeurons):
+        for hiddenNeuronID in range(0, self.numHiddenNeurons):
             pyrosim.Send_Hidden_Neuron(name = len(self.joints) + hiddenNeuronID)
 
-
-        # pyrosim.Send_Synapse( sourceNeuronName = 0 , targetNeuronName = 3 , weight = -1.0 )
-        # pyrosim.Send_Synapse( sourceNeuronName = 1 , targetNeuronName = 3 , weight = -1.0 )
-        # pyrosim.Send_Synapse( sourceNeuronName = 2 , targetNeuronName = 4 , weight = 1.0 )
-
     #   DELETE. WILL OVERWRITE BRAIN EVOLUTION
-        self.weights = [np.random.rand(numHiddenNeurons, len(self.sensorIDs)), np.random.rand(numHiddenNeurons, len(self.joints))]
-        self.weights[0] = self.weights[0] * 2 - 1
-        self.weights[1] = self.weights[1] * 2 - 1
+        # self.weights = [np.random.rand(numHiddenNeurons, len(self.sensorIDs)), np.random.rand(numHiddenNeurons, len(self.joints))]
+        # self.weights[0] = self.weights[0] * 2 - 1
+        # self.weights[1] = self.weights[1] * 2 - 1
 
-        for currentRow in range(0, numHiddenNeurons):
+        for currentRow in range(0, self.numHiddenNeurons):
             for currentColumn in range(0, len(self.sensors)):
-                    sensorName = currentColumn + len(self.joints) + numHiddenNeurons
+                    sensorName = currentColumn + len(self.joints) + self.numHiddenNeurons
                     hiddenNeuronName = len(self.joints) + currentRow
                     pyrosim.Send_Synapse( sourceNeuronName = sensorName , targetNeuronName = hiddenNeuronName , weight = self.weights[0][currentRow][currentColumn] )
 
-        for currentRow in range(0, numHiddenNeurons):
+        for currentRow in range(0, self.numHiddenNeurons):
             for currentColumn in range(0, len(self.joints)):
                     motorName = currentColumn
                     hiddenNeuronName = len(self.joints) + currentRow

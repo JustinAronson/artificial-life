@@ -1,6 +1,7 @@
 import os
 from parallelHillClimber import PARALLEL_HILL_CLIMBER
-import pdb;pdb.set_trace()
+import pdb;
+# pdb.set_trace()
 
 phc = PARALLEL_HILL_CLIMBER()
 # phc.parents[0].Start_Simulation("GUI")
