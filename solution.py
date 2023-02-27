@@ -80,16 +80,27 @@ class SOLUTION:
     def Mutate(self):
         # print("Sensors: ")
         # print(self.sensors)
+        if random.random() < 0.3:
+            self.Mutate_Body()
+        else:
+            self.Mutate_Brain()
 
+    def Mutate_Brain(self):
         sensorToChange = random.choice(self.sensors)
         self.sensorWeights[sensorToChange][random.randint(0, self.numHiddenNeurons - 1)] = random.random() * 2 - 1
 
         motorToChange = random.choice(self.jointPlan)
         self.motorWeights[self.jointPlan.index(motorToChange)][random.randint(0, self.numHiddenNeurons - 1)] = random.random() * 2 - 1
 
-        self.Mutate_Links()
+        mutationProbability = random.random()
+        # Add or subtract a hidden neuron with 10% likelihood
+        if mutationProbability < 0.1:
+            self.numHiddenNeurons += 1
+        elif mutationProbability < 0.2:
+            if self.numHiddenNeurons > 1:
+                self.numHiddenNeurons -= 1
 
-    def Mutate_Links(self):
+    def Mutate_Body(self):
         mutationProbability = random.random()
         # 10% chance to add links
         if mutationProbability < 0.1:
@@ -183,18 +194,10 @@ class SOLUTION:
 
         self.Create_Link_Tree(linkToAdd[0], c.maxDepth - numToAdd, linkToAdd[5], linkToAdd[3], linkToAdd[6])
 
-        # child = []
-        # for link in self.linkPlan:
-        #     if link[1] == linkToAdd[0]:
-        #         child = link
+    # Mutation to change a link's size
+    def Change_Link_Size(self):
+        linkToChange = random.choice(self.linkPlan)
         
-        # if child[4] == 'green':
-            # print('self.weights before adding:')
-            # print(self.weights[0].shape)
-            # # self.weights[0].append(np.random.rand(self.numHiddenNeurons, numToAdd))
-            # self.weights[0] = np.append(self.weights[0], np.random.rand(self.numHiddenNeurons, numToAdd), axis=1)
-            # print('self.weights after adding:')
-            # print(self.weights[0].shape)
 
     def Set_ID(self, nextAvailableID):
         self.myID = nextAvailableID
