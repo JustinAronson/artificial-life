@@ -11,7 +11,7 @@ class SOLUTION:
 
     def __init__(self, nextAvailableID):
         self.myID = nextAvailableID
-        self.sensorIDs = []
+        self.sensors = []
         # self.numLinks = random.randint(c.minLinks, c.maxLinks)
         self.weights = []
         self.nextLinkID = 0
@@ -20,9 +20,18 @@ class SOLUTION:
         self.occupiedSpace = []
         # Keep track of the absolute position of the last joint
         self.lastAbsolutePos = {}
+        # Create body plan
+        # Format: array of links. Each link is an array of: ID, parentID, pos, size, colorName
+        self.linkPlan = []
+        # Format: array of joints. Each joint is an array of: parentID, childID, pos
+        self.jointPlan = []
+
         # Keep track of all link data. Format:
         # Format: key: link. Value: [parentID, depth, availableDirections, prevSize, prevDirection]
         self.links = {}
+
+        # Called on the first generation of robots.
+        self.Create_Body_Plan()
 
     def Evaluate(self, directOrGUI):
         pass
@@ -59,7 +68,7 @@ class SOLUTION:
         breakpoint()
 
         row = random.randint(0, c.numHiddenNeurons - 1)
-        column = self.sensorIDs.index(random.choice(self.sensorIDs))
+        column = self.sensors.index(random.choice(self.sensors))
 
         self.weights[0][row][column] = random.random() * 2 - 1
 
@@ -106,26 +115,26 @@ class SOLUTION:
 
 
     def Create_Body(self):
-        # length = random.randint(1, 20) / 20
-        # width = random.randint(1, 20) / 20
-        # height = random.randint(1, 20) / 20
+        # pyrosim.Start_URDF("body" + str(self.myID) + ".urdf")
+        pyrosim.Start_URDF("body.urdf")
+             
+        self.Create_Links()
 
-        # prevLength = length
-        # prevWidth = width
-        # prevHeight = height
-        
+        pyrosim.End()
+
+    def Create_Body_Plan(self):
         size = [x / 10 for x in random.sample(range(1, 20), 3)]
         pos = [0, 0, 1]
-
-        pyrosim.Start_URDF("body" + str(self.myID) + ".urdf")
 
         self.sensorIDs = []
 
         if random.random() < 0.5:
-            pyrosim.Send_Cube(name = "0", pos = [0, 0, 1], size = size, colorName = 'green')
+            # pyrosim.Send_Cube(name = "0", pos = [0, 0, 1], size = size, colorName = 'green')
+            self.linkPlan.append([0, None, pos, size, 'green'])
             self.sensorIDs.append(0)
         else:
-            pyrosim.Send_Cube(name = "0", pos = [0, 0, 1], size = size, colorName = 'blue')
+            # pyrosim.Send_Cube(name = "0", pos = [0, 0, 1], size = size, colorName = 'blue')
+            self.linkPlan.append([0, None, pos, size, 'blue'])
         
         self.lastAbsolutePos[0] = [0, 0, 0]
         # Update the space that the links occupy
@@ -141,17 +150,6 @@ class SOLUTION:
         # Don't let the robot go in the -z direction, so don't include -3 in directions
         self.Create_Link_Tree(0, 1, [-2, -1, 1, 2, 3], size, 3)
 
-
-        # pyrosim.Send_Cube(name = "0", pos = [0, 0, 1], size = size)
-        # for id in range(0, self.numLinks):
-        #     pos = size
-        #     # size = random.sample(range(0.1, 2), 3)
-        #     size = [x / 10 for x in random.sample(range(1, 20), 3)]
-
-        #     print(size)              
-
-        pyrosim.End()
-
     # Recursivley create links. Keep track of the direction that the link 'trees' have taken from the origin. They cannot go back in the same direction
     # (turn back on themselves). Keep going until a certain depth is reached
 
@@ -159,23 +157,32 @@ class SOLUTION:
         pos, size, direction, directions, jointPos, noSpaceFlag = self.Set_Link_Stats(parentID, depth, availableDirections, prevSize, prevDirection)
         if noSpaceFlag:
             return
-        # Last link in the tree. Base case.
-        if depth == c.maxDepth:
-            # If no links are sensor links, make end link a sensor. Otherwise, make the link a sensor 50% of the time
-            if (random.random() < 0.5) or (len(self.sensorIDs) == 0):
-                self.sensorIDs.append(self.nextLinkID)
-                self.Create_Random_Link(parentID, self.nextLinkID, pos, size, 'green', jointPos)
-            else:
-                self.Create_Random_Link(parentID, self.nextLinkID, pos, size, 'blue', jointPos)
-        else:
-            if (random.random() < 0.5):
-                self.Create_Random_Link(parentID, self.nextLinkID, pos, size, 'green', jointPos)
-            else:
-                self.Create_Random_Link(parentID, self.nextLinkID, pos, size, 'blue', jointPos)
-            # 10% chance of ending the branch
-            # if (random.random() < 0.1):
-            #     return
 
+        # If no links are sensor links, make end link a sensor. Otherwise, make the link a sensor 50% of the time   
+        if (random.random() < 0.5) or (depth == c.maxDepth and (len(self.sensorIDs) == 0)):
+            # self.Create_Random_Link(parentID, self.nextLinkID, pos, size, 'green', jointPos)
+            self.linkPlan.append([self.nextLinkID, parentID, pos, size, 'green'])
+        else:
+            # self.Create_Random_Link(parentID, self.nextLinkID, pos, size, 'blue', jointPos)
+            self.linkPlan.append([self.nextLinkID, parentID, pos, size, 'blue'])
+
+
+        self.jointPlan.append([parentID, self.nextLinkID, jointPos])
+
+        # Update the space that the links occupy
+        space = []
+        for axis in range(0, len(size)):
+            min = self.lastAbsolutePos[self.nextLinkID][axis] + pos[axis] - abs(size[axis] / 2)
+            max = self.lastAbsolutePos[self.nextLinkID][axis] + pos[axis] + abs(size[axis] / 2)
+            space.append([min, max])
+        self.occupiedSpace.append(space)
+
+        self.joints.append([parentID, self.nextLinkID])
+
+        self.nextLinkID += 1
+
+        # Last link in the tree is base case.
+        if depth != c.maxDepth:
             linkID = self.nextLinkID-1
 
             if len(directions) == 1:
@@ -279,24 +286,11 @@ class SOLUTION:
         return pos, size, noSpaceFlag
 
     # Creates a random link with id childID. Also creates a joint from parentID to childID.
-    def Create_Random_Link(self, parentID, childID, pos, size, colorName, jointPos):
-        if parentID == 0:
-            pyrosim.Send_Cube(name=str(childID), pos=pos, size=size, colorName = colorName)
-            pyrosim.Send_Joint(name = str(parentID) + "_" + str(childID) , parent= str(parentID) , child = str(childID) , type = "revolute", position = jointPos, jointAxis = "1 1 0")
-        else:
-            pyrosim.Send_Cube(name=str(childID), pos=pos, size=size, colorName = colorName)
-            pyrosim.Send_Joint(name = str(parentID) + "_" + str(childID) , parent= str(parentID) , child = str(childID) , type = "revolute", position = jointPos, jointAxis = "1 1 0")
-
-        # Update the space that the links occupy
-        space = []
-        for axis in range(0, len(size)):
-            min = self.lastAbsolutePos[self.nextLinkID][axis] + pos[axis] - abs(size[axis] / 2)
-            max = self.lastAbsolutePos[self.nextLinkID][axis] + pos[axis] + abs(size[axis] / 2)
-            space.append([min, max])
-        self.occupiedSpace.append(space)
-
-        self.joints.append([parentID, childID])
-        self.nextLinkID += 1
+    def Create_Links(self):
+        for link in self.linkPlan:
+            pyrosim.Send_Cube(name=str(link[0]), pos=link[2], size=link[3], colorName = link[4])
+        for joint in self.jointPlan:
+            pyrosim.Send_Joint(name = str(joint[0]) + "_" + str(joint[1]) , parent= str(joint[0]) , child = str(joint[1]) , type = "revolute", position = joint[2], jointAxis = "1 1 0")
 
     def Create_Brain(self):
         pyrosim.Start_NeuralNetwork("brain" + str(self.myID) + ".nndf")
@@ -316,8 +310,13 @@ class SOLUTION:
             # if not id == self.numLinks - 1:
             #     pyrosim.Send_Motor_Neuron( name = id , jointName = str(id) + "_" + str(id + 1))
 
-        for id in self.sensorIDs:
-            pyrosim.Send_Sensor_Neuron(name = self.sensorIDs.index(id) + len(self.joints) + numHiddenNeurons , linkName = str(id))            
+        sensorIndex = 0
+        self.sensors = []
+        for link in self.linkPlan:
+            if link[4] == 'green':
+                pyrosim.Send_Sensor_Neuron(name = sensorIndex + len(self.joints) + numHiddenNeurons , linkName = str(link[0]))
+                self.sensors.append(link[0])       
+                sensorIndex += 1     
 
         for joint in self.joints:
             pyrosim.Send_Motor_Neuron( name = self.joints.index(joint) , jointName = str(joint[0]) + "_" + str(joint[1]))
@@ -351,7 +350,7 @@ class SOLUTION:
         self.weights[1] = self.weights[1] * 2 - 1
 
         for currentRow in range(0, numHiddenNeurons):
-            for currentColumn in range(0, len(self.sensorIDs)):
+            for currentColumn in range(0, len(self.sensors)):
                     sensorName = currentColumn + len(self.joints) + numHiddenNeurons
                     hiddenNeuronName = len(self.joints) + currentRow
                     pyrosim.Send_Synapse( sourceNeuronName = sensorName , targetNeuronName = hiddenNeuronName , weight = self.weights[0][currentRow][currentColumn] )
