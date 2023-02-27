@@ -65,9 +65,9 @@ class SOLUTION:
         self.Create_World()
         self.Create_Body()
         self.Create_Brain()
-        # os.system("python3 simulate.py " + directOrGUI + " " + str(self.myID) + " 2&>1 &")
+        os.system("python3 simulate.py " + directOrGUI + " " + str(self.myID) + " 2&>1 &")
         # os.system("python3 simulate.py " + directOrGUI + " " + str(self.myID) + " &")
-        os.system("python3 simulate.py " + directOrGUI + " " + str(self.myID))
+        # os.system("python3 simulate.py " + directOrGUI + " " + str(self.myID))
 
     def Wait_For_Simulation_To_End(self):
         while not os.path.exists("fitness" + str(self.myID) + ".txt"):
@@ -221,8 +221,8 @@ class SOLUTION:
 
 
     def Create_Body(self):
-        # pyrosim.Start_URDF("body" + str(self.myID) + ".urdf")
-        pyrosim.Start_URDF("body.urdf")
+        pyrosim.Start_URDF("body" + str(self.myID) + ".urdf")
+        #pyrosim.Start_URDF("body.urdf")
              
         self.Create_Links()
 
