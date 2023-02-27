@@ -16,7 +16,7 @@ class ROBOT:
         self.Prepare_To_Sense()
         self.Prepare_To_Act()
         self.nn = NEURAL_NETWORK("brain" + solutionID + ".nndf")
-        os.system("rm brain" + str(solutionID) + ".nndf")
+        # os.system("rm brain" + str(solutionID) + ".nndf")
         self.solutionID = solutionID
         self.robotPositionDifference = 200
         self.boxPositionDifference = 200
@@ -45,7 +45,11 @@ class ROBOT:
                 self.motors[jointName].Set_Value(self.robot, desiredAngle)
 
     def Think(self):
-        self.nn.Update()
+        try:
+            self.nn.Update()
+        except:
+            print('Error updating the neural network.')
+            print('Brain ID: ' + str(self.solutionID))
 
     def Get_Fitness(self):
         stateOfLinkZero = p.getLinkState(self.robot, 0)

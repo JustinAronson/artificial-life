@@ -1,16 +1,22 @@
 pybullet build time: Jan  9 2023 15:21:07
-b3Warning[examples/Importers/ImportURDFDemo/BulletUrdfImporter.cpp,126]:
-expected a world element, continuing without it.Going into Sim Run
+Going into Sim Run
 Out Sim Run
-ost recent call last):
-  File "/Users/justin/Documents/CS Classes/artificial-life/simulate.py", line 20, in <module>
-    simulation.Run()
-  File "/Users/justin/Documents/CS Classes/artificial-life/simulation.py", line 38, in Run
-    self.robot.Think()
-  File "/Users/justin/Documents/CS Classes/artificial-life/robot.py", line 48, in Think
-    self.nn.Update()
-  File "/Users/justin/Documents/CS Classes/artificial-life/pyrosim/neuralNetwork.py", line 36, in Update
-    self.neurons[neuron].Update_Hidden_Or_Motor_Neuron(self.neurons, self.synapses)
-  File "/Users/justin/Documents/CS Classes/artificial-life/pyrosim/neuron.py", line 76, in Update_Hidden_Or_Motor_Neuron
-    self.Allow_Presynaptic_Neuron_to_Influence_Me(synapses[synapse].Get_Weight(), neurons[synapse[0]].Get_Value())
-KeyError: '7'
+Version = 4.1 Metal - 76.3
+Vendor = Apple
+Renderer = Apple M2
+b3Printf: Selected demo: Physics Server
+startThreads creating 1 threads.
+starting thread 0
+started thread 0 
+MotionThreadFunc thread started
+b3Printf: b3Warning[examples/Importers/ImportURDFDemo/BulletUrdfImporter.cpp,126]:
+
+b3Printf: expected a world element, continuing without it.
+numActiveThreads = 0
+stopping threads
+Thread with taskId 0 exiting
+Thread TERMINATED
+destroy semaphore
+semaphore destroyed
+destroy main semaphore
+main semaphore destroyed

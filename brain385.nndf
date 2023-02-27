@@ -1,0 +1,51 @@
+<neuralNetwork>
+    <neuron name = "9" type = "sensor" linkName = "0" />
+    <synapse sourceNeuronName = "9" targetNeuronName = "5" weight = "0.5361189894887051" />
+    <synapse sourceNeuronName = "9" targetNeuronName = "6" weight = "-0.9691680842363015" />
+    <synapse sourceNeuronName = "9" targetNeuronName = "7" weight = "0.2619555991025373" />
+    <synapse sourceNeuronName = "9" targetNeuronName = "8" weight = "-0.7641387329653644" />
+    <neuron name = "10" type = "sensor" linkName = "1" />
+    <synapse sourceNeuronName = "10" targetNeuronName = "5" weight = "0.2513384896460531" />
+    <synapse sourceNeuronName = "10" targetNeuronName = "6" weight = "0.40497112417693115" />
+    <synapse sourceNeuronName = "10" targetNeuronName = "7" weight = "-0.6232477103278569" />
+    <synapse sourceNeuronName = "10" targetNeuronName = "8" weight = "0.3679899222461167" />
+    <neuron name = "11" type = "sensor" linkName = "2" />
+    <synapse sourceNeuronName = "11" targetNeuronName = "5" weight = "-0.6921284503742287" />
+    <synapse sourceNeuronName = "11" targetNeuronName = "6" weight = "-0.28179783746565445" />
+    <synapse sourceNeuronName = "11" targetNeuronName = "7" weight = "0.07460923476536507" />
+    <synapse sourceNeuronName = "11" targetNeuronName = "8" weight = "-0.7411987428472298" />
+    <neuron name = "12" type = "sensor" linkName = "4" />
+    <synapse sourceNeuronName = "12" targetNeuronName = "5" weight = "-0.061821286806357234" />
+    <synapse sourceNeuronName = "12" targetNeuronName = "6" weight = "0.014587827665218711" />
+    <synapse sourceNeuronName = "12" targetNeuronName = "7" weight = "0.19746039927675874" />
+    <synapse sourceNeuronName = "12" targetNeuronName = "8" weight = "0.7871504523322916" />
+    <neuron name = "0" type = "motor"  jointName = "0_1" />
+    <synapse sourceNeuronName = "5" targetNeuronName = "0" weight = "-0.5966998904869996" />
+    <synapse sourceNeuronName = "6" targetNeuronName = "0" weight = "-0.6613777879032703" />
+    <synapse sourceNeuronName = "7" targetNeuronName = "0" weight = "-0.7634525673194461" />
+    <synapse sourceNeuronName = "8" targetNeuronName = "0" weight = "-0.7037553258717137" />
+    <neuron name = "1" type = "motor"  jointName = "1_2" />
+    <synapse sourceNeuronName = "5" targetNeuronName = "1" weight = "0.7713278893521536" />
+    <synapse sourceNeuronName = "6" targetNeuronName = "1" weight = "0.39035436171693605" />
+    <synapse sourceNeuronName = "7" targetNeuronName = "1" weight = "-0.566001819200052" />
+    <synapse sourceNeuronName = "8" targetNeuronName = "1" weight = "0.743002973272558" />
+    <neuron name = "2" type = "motor"  jointName = "2_3" />
+    <synapse sourceNeuronName = "5" targetNeuronName = "2" weight = "0.5521259409211592" />
+    <synapse sourceNeuronName = "6" targetNeuronName = "2" weight = "0.441458107396439" />
+    <synapse sourceNeuronName = "7" targetNeuronName = "2" weight = "-0.5989818891738337" />
+    <synapse sourceNeuronName = "8" targetNeuronName = "2" weight = "-0.7085053666910235" />
+    <neuron name = "3" type = "motor"  jointName = "3_4" />
+    <synapse sourceNeuronName = "5" targetNeuronName = "3" weight = "0.7110323343530125" />
+    <synapse sourceNeuronName = "6" targetNeuronName = "3" weight = "0.9046449855396799" />
+    <synapse sourceNeuronName = "7" targetNeuronName = "3" weight = "-0.30943629225729063" />
+    <synapse sourceNeuronName = "8" targetNeuronName = "3" weight = "0.5767182811599774" />
+    <neuron name = "4" type = "motor"  jointName = "3_5" />
+    <synapse sourceNeuronName = "5" targetNeuronName = "4" weight = "-0.19888460189688617" />
+    <synapse sourceNeuronName = "6" targetNeuronName = "4" weight = "-0.13546288296573805" />
+    <synapse sourceNeuronName = "7" targetNeuronName = "4" weight = "0.7017674169576966" />
+    <synapse sourceNeuronName = "8" targetNeuronName = "4" weight = "-0.8534296936573598" />
+ <neuron name = "5" type = "hidden" />
+ <neuron name = "6" type = "hidden" />
+ <neuron name = "7" type = "hidden" />
+ <neuron name = "8" type = "hidden" />
+</neuralNetwork>

@@ -289,7 +289,7 @@ class SOLUTION:
             space.append([min, max])
         self.occupiedSpace.append(space)
 
-        self.joints.append([parentID, self.nextLinkID])
+        # self.joints.append([parentID, self.nextLinkID])
 
         # Update available directions for parent
         for link in self.linkPlan:
@@ -419,18 +419,6 @@ class SOLUTION:
     def Create_Brain(self):
         pyrosim.Start_NeuralNetwork("brain" + str(self.myID) + ".nndf")
 
-        # pyrosim.Send_Sensor_Neuron(name = 0 , linkName = "BackLowerLeg")
-        # pyrosim.Send_Sensor_Neuron(name = 1 , linkName = "FrontLowerLeg")
-        # pyrosim.Send_Sensor_Neuron(name = 2 , linkName = "LeftLowerLeg")
-        # pyrosim.Send_Sensor_Neuron(name = 3 , linkName = "RightLowerLeg")
-
-        # for id in range(0, self.nextLinkID):
-        #     if id in self.sensorIDs:
-        #         # Number of motor joints = self.numLinks-1, ids start at 0
-        #         pyrosim.Send_Sensor_Neuron(name = self.sensorIDs.index(id) + (self.numLinks-1) + numHiddenNeurons , linkName = str(id))
-            # if not id == self.numLinks - 1:
-            #     pyrosim.Send_Motor_Neuron( name = id , jointName = str(id) + "_" + str(id + 1))
-
         sensorIndex = 0
         self.sensors = []
         for link in self.linkPlan:
@@ -444,7 +432,7 @@ class SOLUTION:
                         self.sensorWeights[link[0]].append(random.random() * 2 - 1)
 
                 for i in range(0, self.numHiddenNeurons):
-                    hiddenNeuronName = len(self.joints) + i
+                    hiddenNeuronName = len(self.jointPlan) + i
                     pyrosim.Send_Synapse( sourceNeuronName = sensorIndex + len(self.jointPlan) + self.numHiddenNeurons , targetNeuronName = hiddenNeuronName , weight = self.sensorWeights[link[0]][i] )
 
                 self.sensors.append(link[0])     
@@ -463,7 +451,7 @@ class SOLUTION:
                     self.motorWeights[self.jointPlan.index(joint)].append(random.random() * 2 - 1)
 
             for i in range(0, self.numHiddenNeurons):
-                hiddenNeuronName = len(self.joints) + i
+                hiddenNeuronName = len(self.jointPlan) + i
                 pyrosim.Send_Synapse( sourceNeuronName = hiddenNeuronName , targetNeuronName = self.jointPlan.index(joint) , weight = self.motorWeights[self.jointPlan.index(joint)][i] )
 
         for hiddenNeuronID in range(0, self.numHiddenNeurons):
