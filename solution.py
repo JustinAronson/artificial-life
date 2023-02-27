@@ -78,8 +78,8 @@ class SOLUTION:
         os.system("rm fitness" + str(self.myID) + ".txt")        
 
     def Mutate(self):
-        print("Sensors: ")
-        print(self.sensors)
+        # print("Sensors: ")
+        # print(self.sensors)
 
         sensorToChange = random.choice(self.sensors)
         self.sensorWeights[sensorToChange][random.randint(0, self.numHiddenNeurons - 1)] = random.random() * 2 - 1
@@ -99,17 +99,17 @@ class SOLUTION:
         elif mutationProbability < 0.2:
             # If there two or fewer links, do not remove
             if len(self.linkPlan) > 2:
-                print('Going into remove links')
+                # print('Going into remove links')
                 self.Remove_Links()
 
         # 20% chance to add sensor link
         elif mutationProbability < 0.4:
-            print('Adding sensor')
+            # print('Adding sensor')
             self.Switch_Sensor_Status('blue', 'green')
 
         # 20% chance to remove a sensor link
         elif mutationProbability < 0.6:
-            print('Removing sensor')
+            # print('Removing sensor')
             self.Switch_Sensor_Status('green', 'blue')
 
     def Switch_Sensor_Status(self, currentColor, newColor):
@@ -146,16 +146,16 @@ class SOLUTION:
         #         parent = link
 
         linkToRemove = random.choice(linksWithoutChildren)
-        print('Removing link :')
-        print(linkToRemove)
+        # print('Removing link :')
+        # print(linkToRemove)
 
         self.linkPlan.remove(linkToRemove)
 
         for joint in self.jointPlan:
             # if joint[0] == parent[0] and joint[1] == linkToRemove[0]:
             if joint[1] == linkToRemove[0]:
-                print('Removing joint : ')
-                print(joint)
+                # print('Removing joint : ')
+                # print(joint)
                 # Remove the joint from weights
                 del self.motorWeights[self.jointPlan.index(joint)]
 
@@ -265,7 +265,7 @@ class SOLUTION:
     # Recursivley create links. Keep track of the direction that the link 'trees' have taken from the origin. They cannot go back in the same direction
     # (turn back on themselves). Keep going until a certain depth is reached
     def Create_Link_Tree(self, parentID, depth, availableDirections, prevSize, prevDirection):
-        print("In Create_Link_Tree, depth = " + str(depth))
+        # print("In Create_Link_Tree, depth = " + str(depth))
         pos, size, direction, directions, jointPos, noSpaceFlag = self.Set_Link_Stats(parentID, availableDirections, prevSize, prevDirection)
         if noSpaceFlag:
             return
@@ -380,7 +380,7 @@ class SOLUTION:
                         if ((linkSpace[(axis + 2) % 3][0]+0.01 < dim3min < linkSpace[(axis + 2) % 3][1]-0.01) or 
                             (linkSpace[(axis + 2) % 3][0]+0.01 < dim3max < linkSpace[(axis + 2) % 3][1]-0.01)) or ((linkSpace[(axis + 2) % 3][0]+0.01) > dim3min
                             and dim3max > (linkSpace[(axis + 2) % 3][1]-0.01)):
-                            print("No space")
+                            # print("No space")
 
                             noSpaceFlag = True
                             break
@@ -450,8 +450,8 @@ class SOLUTION:
                 self.sensors.append(link[0])     
                 sensorIndex += 1
             
-        print("Sensors: ")
-        print(self.sensors)
+        # print("Sensors: ")
+        # print(self.sensors)
 
         for joint in self.jointPlan:
             pyrosim.Send_Motor_Neuron( name = self.jointPlan.index(joint) , jointName = str(joint[0]) + "_" + str(joint[1]))
