@@ -11,11 +11,12 @@ class ROBOT:
 
     def __init__(self, solutionID):
         self.robot = p.loadURDF("body" + solutionID + ".urdf")
+        os.system("rm body" + str(solutionID) + ".urdf")
         pyrosim.Prepare_To_Simulate(self.robot)
         self.Prepare_To_Sense()
         self.Prepare_To_Act()
         self.nn = NEURAL_NETWORK("brain" + solutionID + ".nndf")
-        # os.system("rm brain" + str(solutionID) + ".nndf")
+        os.system("rm brain" + str(solutionID) + ".nndf")
         self.solutionID = solutionID
         self.robotPositionDifference = 200
         self.boxPositionDifference = 200

@@ -84,8 +84,8 @@ class SOLUTION:
         sensorToChange = random.choice(self.sensors)
         self.sensorWeights[sensorToChange][random.randint(0, self.numHiddenNeurons - 1)] = random.random() * 2 - 1
 
-        motorToChange = random.choice(self.joints)
-        self.motorWeights[self.joints.index(motorToChange)][random.randint(0, self.numHiddenNeurons - 1)] = random.random() * 2 - 1
+        motorToChange = random.choice(self.jointPlan)
+        self.motorWeights[self.jointPlan.index(motorToChange)][random.randint(0, self.numHiddenNeurons - 1)] = random.random() * 2 - 1
 
         self.Mutate_Links()
 
@@ -265,6 +265,7 @@ class SOLUTION:
     # Recursivley create links. Keep track of the direction that the link 'trees' have taken from the origin. They cannot go back in the same direction
     # (turn back on themselves). Keep going until a certain depth is reached
     def Create_Link_Tree(self, parentID, depth, availableDirections, prevSize, prevDirection):
+        print("In Create_Link_Tree, depth = " + str(depth))
         pos, size, direction, directions, jointPos, noSpaceFlag = self.Set_Link_Stats(parentID, availableDirections, prevSize, prevDirection)
         if noSpaceFlag:
             return
@@ -298,20 +299,24 @@ class SOLUTION:
         self.nextLinkID += 1
 
         # Last link in the tree is base case.
-        if depth != c.maxDepth:
+        if depth < c.maxDepth:
             linkID = self.nextLinkID-1
 
             if len(directions) == 1:
                 self.Create_Link_Tree(linkID, depth + 1, directions, size, direction)
             else:
                 numBranches = random.randint(1, len(directions) - 1)
+                increment = math.floor(len(directions)/numBranches)
                 spliceStart = 0
-                while spliceStart < len(directions):
-                    if spliceStart + math.floor(len(directions)/numBranches) <= len(directions):
+                if increment == 0:
+                    increment += 1
+                end = len(directions)
+                while spliceStart < end:
+                    if spliceStart + increment <= len(directions):
                         self.Create_Link_Tree(linkID, depth + 1, directions[spliceStart:spliceStart + math.floor(len(directions)/numBranches)], size, direction)
                     else:
                         self.Create_Link_Tree(linkID, depth + 1, directions[spliceStart:], size, direction)
-                    spliceStart += math.floor(len(directions)/numBranches)
+                    spliceStart += increment
 
             # self.Create_Link_Tree(self.nextLinkID-1, depth + 1, directions, size, direction)
 
