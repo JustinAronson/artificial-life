@@ -3,6 +3,7 @@ from solution import SOLUTION
 import constants as c
 import copy
 import os
+import pickle
 
 class PARALLEL_HILL_CLIMBER:
 
@@ -18,6 +19,7 @@ class PARALLEL_HILL_CLIMBER:
             self.nextAvailableID += 1
         # self.parent = SOLUTION()
         # print("Out HILL_CLIMBER")
+        self.bestFitnessValues = []
 
     def Evolve(self):
         self.Evaluate(self.parents)
@@ -44,9 +46,15 @@ class PARALLEL_HILL_CLIMBER:
             self.children[id].Mutate()
 
     def Select(self):
+        minFitness = 10000
         for id in self.parents:
             if self.children[id].fitness < self.parents[id].fitness:
                 self.parents[id] = self.children[id]
+
+            if self.parents[id].fitness < minFitness:
+                minFitness = self.parents[id].fitness
+
+        self.bestFitnessValues.append(minFitness)
 
     def Print(self):
         for id in self.parents:
@@ -55,11 +63,17 @@ class PARALLEL_HILL_CLIMBER:
             print('Child fitness: ' + str(self.children[id].fitness))
             print("")
 
-    def Show_Best(self):
+    def Show_Best(self, fileName):
         lowestFitnessParent = self.parents[0]
         for id in self.parents:
             if self.parents[id].fitness < lowestFitnessParent.fitness:
                 lowestFitnessParent = self.parents[id]
+        
+        pickle.dump( lowestFitnessParent.linkPlan, open( fileName + "linkPlan.p", "wb" ) )
+        pickle.dump( lowestFitnessParent.jointPlan, open( fileName + "jointPlan.p", "wb" ) )
+        pickle.dump( lowestFitnessParent.sensorWeights, open( fileName + "sensorWeights.p", "wb" ) )
+        pickle.dump( lowestFitnessParent.motorWeights, open( fileName + "motorWeights.p", "wb" ) )
+        
         lowestFitnessParent.Start_Simulation("GUI")
 
     def Evaluate(self, solutions):
