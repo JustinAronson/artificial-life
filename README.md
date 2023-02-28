@@ -29,7 +29,7 @@ Links can be generated in any direction except for the negative z direction, and
 After each generation was simulated, either the brain or body of the robot was mutated. One of the two was mutated at each generation, and both were never mutated in the same generation.
 
 # Brain Evolution
-When the brain mutated, the weight of one of the synapses sending information from a sensor neuron to a hidden neuron was randomized, as well as the weight of one of the synapses sending information from a hidden neuron to a motor neuron. Additionally, there was a 10% chance that a hidden neuron would be either deleted or gained each time the brain mutated. This hidden neuron would be connected to all sensor neurons and motor neurons. The following diagram demonstrates the connections lost from gaining or losing a hidden neuron: . Hidden neurons would be mutated such that there is always one hidden neuron in the brain.
+When the brain mutated, the weight of one of the synapses sending information from a sensor neuron to a hidden neuron was randomized, as well as the weight of one of the synapses sending information from a hidden neuron to a motor neuron. Additionally, there was a 10% chance that a hidden neuron would be either deleted or gained each time the brain mutated. This hidden neuron would be connected to all sensor neurons and motor neurons. The following diagram demonstrates the connections lost from gaining or losing a hidden neuron: ![Changing Hidden Neurons](https://github.com/JustinAronson/artificial-life/blob/3d-creatures/Changing%20Hidden%20Neurons.jpg). Hidden neurons would be mutated such that there is always one hidden neuron in the brain.
 
 # Body Evolution
 When the body mutated, one of the following could happen with related weights:
@@ -45,7 +45,7 @@ Chance (Percent)  | Effect
 These are all mutually exclusive events (one generation of robots cannot have both an add link and remove link mutation).
 ### Add links
 
-This mutation has a 60% chance to add a single link, a 30% chance to add two links, and a 10% chance to add three links to the creature. It adds links to any open face of the creature. The open face does not need to be at the end of a branch. All added links follow the rules of body generation, with the exception of the following rule: Links are not added past the max depth of the robot. Mutated links are able to be added beyond the depth specified in constants.py. Diagram depicting this addition:
+This mutation has a 60% chance to add a single link, a 30% chance to add two links, and a 10% chance to add three links to the creature. It adds links to any open face of the creature. The open face does not need to be at the end of a branch. All added links follow the rules of body generation, with the exception of the following rule: Links are not added past the max depth of the robot. Mutated links are able to be added beyond the depth specified in constants.py. Diagram depicting this addition: ![Adding links](https://github.com/JustinAronson/artificial-life/blob/3d-creatures/Adding%20link.jpg)
 ### Remove link
           
 This mutation removes a single random link from the creature. Removed links are always at the end of a branch.
@@ -57,7 +57,7 @@ This mutation changes a single random non-sensing link into a sensing link. Syna
 This mutation changes a single random sensing link into a non-sensing link. The sensor neuron associated with the link is deleted.
 ### Change link size
           
-This mutation changes a random link's size in the creature. The relative positions of the links upstream to it in the creature remain the same. When updating the link's size causes an intersection between any two links in the creature, the mutation is aborted and the link remains at its current size. Diagram depicting this check:
+This mutation changes a random link's size in the creature. The relative positions of the links upstream to it in the creature remain the same. When updating the link's size causes an intersection between any two links in the creature, the mutation is aborted and the link remains at its current size. Diagram depicting this check: ![Changing Link Size](https://github.com/JustinAronson/artificial-life/blob/3d-creatures/Changing%20link%20size.jpg)
 
 # Simulation Overview
 The simulation submitted for Assignment 7 used the constants found in constants.py. The bodies were evolved by mutating a parent generation, and picking the robots with the best fitness from each family. Fitness was determined by the robot's Euclidean distance to the point -100, -100. A smaller distance was prefered.
