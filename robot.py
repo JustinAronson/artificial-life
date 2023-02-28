@@ -16,7 +16,7 @@ class ROBOT:
         self.Prepare_To_Sense()
         self.Prepare_To_Act()
         self.nn = NEURAL_NETWORK("brain" + solutionID + ".nndf")
-        # os.system("rm brain" + str(solutionID) + ".nndf")
+        os.system("rm brain" + str(solutionID) + ".nndf")
         self.solutionID = solutionID
         self.robotPositionDifference = 200
         self.boxPositionDifference = 200

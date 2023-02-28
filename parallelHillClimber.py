@@ -75,6 +75,7 @@ class PARALLEL_HILL_CLIMBER:
         pickle.dump( lowestFitnessParent.motorWeights, open( fileName + "motorWeights.p", "wb" ) )
         
         lowestFitnessParent.Start_Simulation("GUI")
+        lowestFitnessParent.Wait_For_Simulation_To_End()
 
     def Evaluate(self, solutions):
         for id in solutions:

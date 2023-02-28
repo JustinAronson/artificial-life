@@ -87,6 +87,15 @@ class SOLUTION:
             self.Mutate_Brain()
 
     def Mutate_Brain(self):
+        # If there are no sensors, make the root node a sensor
+        self.sensors = []
+        for link in self.linkPlan:
+            if link[4] == 'green':
+                self.sensors.append(link[0])
+
+        if len(self.sensors) == 0:
+            self.linkPlan[0][4] = 'green'
+
         sensorToChange = random.choice(self.sensors)
         self.sensorWeights[sensorToChange][random.randint(0, self.numHiddenNeurons - 1)] = random.random() * 2 - 1
 
@@ -146,7 +155,7 @@ class SOLUTION:
                 self.sensors.append(link[0])
 
         if len(self.sensors) == 0:
-            self.linkPlan[0][4] == 'green'
+            self.linkPlan[0][4] = 'green'
 
     def Switch_Sensor_Status(self, currentColor, newColor):
         swappableLinks = []
