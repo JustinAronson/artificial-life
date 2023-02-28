@@ -69,7 +69,7 @@ This mutation changes a random link's size in the creature. The relative positio
 <img src="https://github.com/JustinAronson/artificial-life/blob/3d-creatures/Changing%20link%20size.jpg" width = 300 height = whatever>
 
 # Simulation Overview
-The simulation submitted for Assignment 7 used the constants found in constants.py. The bodies were evolved by mutating a parent generation, and picking the robots with the best fitness from each family. Fitness was determined by the robot's Euclidean distance to the point -100, -100. A smaller distance was prefered.
+The simulation submitted for Assignment 8 used the constants found in constants.py. The runs for seeds (1, 2, 3, 4, and 5) in the graph below can be repeated by running search.py. Other runs can be tested by changing the value used by ``` random.seed() ``` in search.py. The bodies were evolved by mutating a parent generation, and picking the robots with the best fitness from each family. Fitness was determined by the robot's Euclidean distance to the point -100, -100. A smaller distance was prefered.
 
 ## Fitness Values at each Generation
 The following graph contains the best fitness value at each generation for 5 robots over 50 generations, with a population size of 50. A smaller fitness value was preferred. ![Graph](https://github.com/JustinAronson/artificial-life/blob/3d-creatures/Screen%20Shot%202023-02-28%20at%2012.11.16%20AM.png)
