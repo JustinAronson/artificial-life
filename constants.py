@@ -9,9 +9,9 @@ phaseOffsetFront = numpy.pi/4
 
 loopIterations = 10000
 
-numberOfGenerations = 10
-populationSize = 10
-numTrials = 2
+numberOfGenerations = 100
+populationSize = 100
+numTrials = 5
 
 numSensorNeurons = 4
 numMotorNeurons = 8

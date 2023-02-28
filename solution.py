@@ -95,6 +95,12 @@ class SOLUTION:
 
         if len(self.sensors) == 0:
             self.linkPlan[0][4] = 'green'
+            self.sensors.append(self.linkPlan[0][0])
+        
+        if self.linkPlan[0][0] not in self.sensorWeights:
+            self.sensorWeights[self.linkPlan[0][0]] = []
+            for i in range(0, self.numHiddenNeurons):
+                self.sensorWeights[self.linkPlan[0][0]].append(random.random() * 2 - 1)
 
         sensorToChange = random.choice(self.sensors)
         self.sensorWeights[sensorToChange][random.randint(0, self.numHiddenNeurons - 1)] = random.random() * 2 - 1
@@ -156,6 +162,12 @@ class SOLUTION:
 
         if len(self.sensors) == 0:
             self.linkPlan[0][4] = 'green'
+            self.sensors.append(self.linkPlan[0][0])
+
+        if self.linkPlan[0][0] not in self.sensorWeights:
+            self.sensorWeights[self.linkPlan[0][0]] = []
+            for i in range(0, self.numHiddenNeurons):
+                self.sensorWeights[self.linkPlan[0][0]].append(random.random() * 2 - 1)
 
     def Switch_Sensor_Status(self, currentColor, newColor):
         swappableLinks = []
