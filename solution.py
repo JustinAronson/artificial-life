@@ -97,9 +97,20 @@ class SOLUTION:
         # Add or subtract a hidden neuron with 10% likelihood
         if mutationProbability < 0.1:
             self.numHiddenNeurons += 1
+            for sensor in self.sensorWeights:
+                sensor.append(random.random() * 2 - 1)
+
+            for motor in self.motorWeights:
+                motor.append(random.random() * 2 - 1)
+
         elif mutationProbability < 0.2:
             if self.numHiddenNeurons > 1:
                 self.numHiddenNeurons -= 1
+                for sensor in self.sensorWeights:
+                    sensor.pop(self.numHiddenNeurons)
+
+                for motor in self.motorWeights:
+                    motor.pop(self.numHiddenNeurons)
 
     def Mutate_Body(self):
         mutationProbability = random.random()
