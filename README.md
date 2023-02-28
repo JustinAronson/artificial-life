@@ -62,6 +62,9 @@ This mutation changes a random link's size in the creature. The relative positio
 # Simulation Overview
 The simulation submitted for Assignment 7 used the constants found in constants.py. The bodies were evolved by mutating a parent generation, and picking the robots with the best fitness from each family. Fitness was determined by the robot's Euclidean distance to the point -100, -100. A smaller distance was prefered.
 
+## Fitness Values at each Generation
+The following graph contains the best fitness value at each generation for 5 robots over 50 generations, with a population size of 50. A smaller fitness value was preferred. ![Graph](https://github.com/JustinAronson/artificial-life/blob/3d-creatures/Screen%20Shot%202023-02-28%20at%2012.11.16%20AM.png)
+
 A popular strategy used by robots in this simulation was building tall robots which fell over in the (-x, -y) direction. Future fitness functions will test for robot movement after a certain time step to make this strategy more difficult.
 
 # Citations
