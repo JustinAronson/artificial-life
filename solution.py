@@ -123,6 +123,9 @@ class SOLUTION:
             # print('Removing sensor')
             self.Switch_Sensor_Status('green', 'blue')
 
+        else:
+            self.Change_Link_Size()
+
     def Switch_Sensor_Status(self, currentColor, newColor):
         swappableLinks = []
         linkIndex = 0
@@ -200,8 +203,12 @@ class SOLUTION:
 
     # Mutation to change a link's size
     def Change_Link_Size(self):
-        linkToChange = random.choice(self.linkPlan)
+        oldLinkPlan = self.linkPlan.copy()
+        oldPositions = self.lastAbsolutePos.copy()
+
+        linkToChange = self.linkPlan[random.randint(0, len(self.linkPlan) - 1)]
         linkChildren = [linkToChange]
+        directChildren = []
         # Search linkplan for links with parent in an array of linkToChange's children
         passWithChildren = True
         while passWithChildren:
@@ -211,6 +218,45 @@ class SOLUTION:
                     if link[1] == parent[0]:
                         passWithChildren = True
                         linkChildren.append(link)
+                        if parent[0] == linkToChange[0]:
+                            directChildren.append(link)
+
+
+        size = [random.randrange(1, 5), random.randrange(1, 5), random.randrange(1, 5)]
+        pos = [0, 0, 0]
+
+        # While size is within position from previous links, shrink link
+
+        # Shift the block from joint in the direction chosen. Multiply size by -1 if direction is negative
+        pos[abs(linkToChange[6]) - 1] = size[abs(linkToChange[6]) - 1]/2 * (linkToChange[6] / abs(linkToChange[6]))
+
+        linkToChange[2] = pos
+        linkToChange[3] = size
+
+        for child in directChildren:
+            jointPos = [0, 0, 0]
+            if linkToChange[0] == 0:
+                jointPos[2] = 1
+                jointPos[abs(child[6]) - 1] += self.linkPlan[0][3][abs(child[6]) - 1] / 2 * (child[6] / abs(child[6]))
+            else:
+                jointPos[abs(linkToChange[6]) - 1] = size[abs(linkToChange[6]) - 1] / 2 * (linkToChange[6] / abs(linkToChange[6]))
+                jointPos[abs(child[6]) - 1] += size[abs(child[6]) - 1] / 2 * (child[6] / abs(child[6]))
+
+            # Update the last position
+            self.lastAbsolutePos[child[0]] = [0, 0, 0]
+            for axis in range(0, len(jointPos)):
+                self.lastAbsolutePos[child[0]][axis] = self.lastAbsolutePos[linkToChange[0]][axis] + jointPos[axis]
+
+        conflictingSize = False
+        for link in linkChildren:
+            pos, size, noSpaceFlag = self.Check_For_Intersections(link[2], link[3], link[0])
+            if noSpaceFlag:
+                conflictingSize = True
+                break
+
+        if conflictingSize:
+            self.lastAbsolutePos = oldPositions
+            self.linkPlan = oldLinkPlan
 
         
 
@@ -365,7 +411,7 @@ class SOLUTION:
         for axis in range(0, len(jointPos)):
             self.lastAbsolutePos[self.nextLinkID][axis] = self.lastAbsolutePos[parentID][axis] + jointPos[axis]
 
-        pos, size, noSpaceFlag = self.Check_For_Intersections(pos, size, direction)
+        pos, size, noSpaceFlag = self.Check_For_Intersections(pos, size, self.nextLinkID)
 
         # Prevent the link tree from doubling back on itself
         if (-1 * direction in directions) and (not noSpaceFlag):
@@ -373,17 +419,17 @@ class SOLUTION:
 
         return pos, size, direction, directions, jointPos, noSpaceFlag
 
-    def Check_For_Intersections(self, pos, size, direction):
+    def Check_For_Intersections(self, pos, size, linkID):
         noSpaceFlag = False
         for link in self.occupiedSpace:
             for linkSpace in link:
                 for axis in range(0, len(linkSpace)):
-                    dim1min = self.lastAbsolutePos[self.nextLinkID][axis] + pos[axis] - abs(size[axis] / 2)
-                    dim1max = self.lastAbsolutePos[self.nextLinkID][axis] + pos[axis] + abs(size[axis] / 2)
-                    dim2min = self.lastAbsolutePos[self.nextLinkID][(axis + 1) % 3] + pos[(axis + 1) % 3] - abs(size[(axis + 1) % 3] / 2)
-                    dim2max = self.lastAbsolutePos[self.nextLinkID][(axis + 1) % 3] + pos[(axis + 1) % 3] + abs(size[(axis + 1) % 3] / 2)
-                    dim3min = self.lastAbsolutePos[self.nextLinkID][(axis + 2) % 3] + pos[(axis + 2) % 3] - abs(size[(axis + 2) % 3] / 2)
-                    dim3max = self.lastAbsolutePos[self.nextLinkID][(axis + 2) % 3] + pos[(axis + 2) % 3] + abs(size[(axis + 2) % 3] / 2)
+                    dim1min = self.lastAbsolutePos[linkID][axis] + pos[axis] - abs(size[axis] / 2)
+                    dim1max = self.lastAbsolutePos[linkID][axis] + pos[axis] + abs(size[axis] / 2)
+                    dim2min = self.lastAbsolutePos[linkID][(axis + 1) % 3] + pos[(axis + 1) % 3] - abs(size[(axis + 1) % 3] / 2)
+                    dim2max = self.lastAbsolutePos[linkID][(axis + 1) % 3] + pos[(axis + 1) % 3] + abs(size[(axis + 1) % 3] / 2)
+                    dim3min = self.lastAbsolutePos[linkID][(axis + 2) % 3] + pos[(axis + 2) % 3] - abs(size[(axis + 2) % 3] / 2)
+                    dim3max = self.lastAbsolutePos[linkID][(axis + 2) % 3] + pos[(axis + 2) % 3] + abs(size[(axis + 2) % 3] / 2)
                     # print('axis:' + str(axis))
                     # print('axis + 1:' + str((axis + 1) % 3))
                     # print('axis + 1 last pos value:' + str(self.lastAbsolutePos[self.nextLinkID][(axis + 1) % 3]))
