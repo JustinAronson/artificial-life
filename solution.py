@@ -80,6 +80,7 @@ class SOLUTION:
     def Mutate(self):
         # print("Sensors: ")
         # print(self.sensors)
+
         if random.random() < 0.3:
             self.Mutate_Body()
         else:
@@ -123,6 +124,7 @@ class SOLUTION:
             # print('Removing sensor')
             self.Switch_Sensor_Status('green', 'blue')
 
+        # 40% chance to change a link size
         else:
             self.Change_Link_Size()
 
@@ -203,8 +205,10 @@ class SOLUTION:
 
     # Mutation to change a link's size
     def Change_Link_Size(self):
+        # print('In Change Link Size')
         oldLinkPlan = self.linkPlan.copy()
         oldPositions = self.lastAbsolutePos.copy()
+        oldSpace = self.occupiedSpace.copy()
 
         linkToChange = self.linkPlan[random.randint(0, len(self.linkPlan) - 1)]
         linkChildren = [linkToChange]
@@ -215,12 +219,16 @@ class SOLUTION:
             passWithChildren = False
             for link in self.linkPlan:
                 for parent in linkChildren:
-                    if link[1] == parent[0]:
+                    if link not in linkChildren and link[1] == parent[0]:
                         passWithChildren = True
                         linkChildren.append(link)
                         if parent[0] == linkToChange[0]:
                             directChildren.append(link)
 
+        # print('Link to Change:')
+        # print(linkToChange)
+        # print('Link Children:')
+        # print(linkChildren)
 
         size = [random.randrange(1, 5), random.randrange(1, 5), random.randrange(1, 5)]
         pos = [0, 0, 0]
@@ -228,7 +236,10 @@ class SOLUTION:
         # While size is within position from previous links, shrink link
 
         # Shift the block from joint in the direction chosen. Multiply size by -1 if direction is negative
-        pos[abs(linkToChange[6]) - 1] = size[abs(linkToChange[6]) - 1]/2 * (linkToChange[6] / abs(linkToChange[6]))
+        if linkToChange[0] != 0:
+            pos[abs(linkToChange[6]) - 1] = size[abs(linkToChange[6]) - 1]/2 * (linkToChange[6] / abs(linkToChange[6]))
+        else:
+            pos = [0, 0, 1]
 
         linkToChange[2] = pos
         linkToChange[3] = size
@@ -247,16 +258,29 @@ class SOLUTION:
             for axis in range(0, len(jointPos)):
                 self.lastAbsolutePos[child[0]][axis] = self.lastAbsolutePos[linkToChange[0]][axis] + jointPos[axis]
 
+        # print('Going into size checks')
         conflictingSize = False
         for link in linkChildren:
             pos, size, noSpaceFlag = self.Check_For_Intersections(link[2], link[3], link[0])
+
             if noSpaceFlag:
                 conflictingSize = True
                 break
 
+            # Update the space that the links occupy
+            space = []
+            for axis in range(0, len(size)):
+                min = self.lastAbsolutePos[link[0]][axis] + link[2][axis] - abs(link[3][axis] / 2)
+                max = self.lastAbsolutePos[link[0]][axis] + link[2][axis] + abs(link[3][axis] / 2)
+                space.append([min, max])
+            self.occupiedSpace.append([link[0], space])
+
+        # print('Out size checks. Legal: ')
+        # print(conflictingSize)
         if conflictingSize:
             self.lastAbsolutePos = oldPositions
             self.linkPlan = oldLinkPlan
+            self.occupiedSpace = oldSpace
 
         
 
@@ -422,56 +446,56 @@ class SOLUTION:
     def Check_For_Intersections(self, pos, size, linkID):
         noSpaceFlag = False
         for link in self.occupiedSpace:
-            for linkSpace in link:
-                for axis in range(0, len(linkSpace)):
-                    dim1min = self.lastAbsolutePos[linkID][axis] + pos[axis] - abs(size[axis] / 2)
-                    dim1max = self.lastAbsolutePos[linkID][axis] + pos[axis] + abs(size[axis] / 2)
-                    dim2min = self.lastAbsolutePos[linkID][(axis + 1) % 3] + pos[(axis + 1) % 3] - abs(size[(axis + 1) % 3] / 2)
-                    dim2max = self.lastAbsolutePos[linkID][(axis + 1) % 3] + pos[(axis + 1) % 3] + abs(size[(axis + 1) % 3] / 2)
-                    dim3min = self.lastAbsolutePos[linkID][(axis + 2) % 3] + pos[(axis + 2) % 3] - abs(size[(axis + 2) % 3] / 2)
-                    dim3max = self.lastAbsolutePos[linkID][(axis + 2) % 3] + pos[(axis + 2) % 3] + abs(size[(axis + 2) % 3] / 2)
-                    # print('axis:' + str(axis))
-                    # print('axis + 1:' + str((axis + 1) % 3))
-                    # print('axis + 1 last pos value:' + str(self.lastAbsolutePos[self.nextLinkID][(axis + 1) % 3]))
-                    # Give 0.1 margin because of rounding
-                    while (((linkSpace[axis][0]+0.01) < dim1min < (linkSpace[axis][1]-0.01)) or 
-                        ((linkSpace[axis][0]+0.01) < dim1max < (linkSpace[axis][1]-0.01))) or ((linkSpace[axis][0]+0.01) > dim1min
-                        and dim1max > (linkSpace[axis][1]-0.01)):
-                        # print("Dim 1 check passed")
-                        if ((linkSpace[(axis + 1) % 3][0]+0.01 < dim2min < linkSpace[(axis + 1) % 3][1]-0.01) or 
-                            (linkSpace[(axis + 1) % 3][0]+0.01 < dim2max < linkSpace[(axis + 1) % 3][1]-0.01)) or ((linkSpace[(axis + 1) % 3][0]+0.01) > dim2min
-                            and dim2max > (linkSpace[(axis + 1) % 3][1]-0.01)):
-                            # print("Dim 2 check passed")
-                            if ((linkSpace[(axis + 2) % 3][0]+0.01 < dim3min < linkSpace[(axis + 2) % 3][1]-0.01) or 
-                                (linkSpace[(axis + 2) % 3][0]+0.01 < dim3max < linkSpace[(axis + 2) % 3][1]-0.01)) or ((linkSpace[(axis + 2) % 3][0]+0.01) > dim3min
-                                and dim3max > (linkSpace[(axis + 2) % 3][1]-0.01)):
-                                # print("No space")
+            linkSpace = link[1]
+            for axis in range(0, len(linkSpace)):
+                dim1min = self.lastAbsolutePos[linkID][axis] + pos[axis] - abs(size[axis] / 2)
+                dim1max = self.lastAbsolutePos[linkID][axis] + pos[axis] + abs(size[axis] / 2)
+                dim2min = self.lastAbsolutePos[linkID][(axis + 1) % 3] + pos[(axis + 1) % 3] - abs(size[(axis + 1) % 3] / 2)
+                dim2max = self.lastAbsolutePos[linkID][(axis + 1) % 3] + pos[(axis + 1) % 3] + abs(size[(axis + 1) % 3] / 2)
+                dim3min = self.lastAbsolutePos[linkID][(axis + 2) % 3] + pos[(axis + 2) % 3] - abs(size[(axis + 2) % 3] / 2)
+                dim3max = self.lastAbsolutePos[linkID][(axis + 2) % 3] + pos[(axis + 2) % 3] + abs(size[(axis + 2) % 3] / 2)
+                # print('axis:' + str(axis))
+                # print('axis + 1:' + str((axis + 1) % 3))
+                # print('axis + 1 last pos value:' + str(self.lastAbsolutePos[self.nextLinkID][(axis + 1) % 3]))
+                # Give 0.1 margin because of rounding
+                while (((linkSpace[axis][0]+0.01) < dim1min < (linkSpace[axis][1]-0.01)) or 
+                    ((linkSpace[axis][0]+0.01) < dim1max < (linkSpace[axis][1]-0.01))) or ((linkSpace[axis][0]+0.01) > dim1min
+                    and dim1max > (linkSpace[axis][1]-0.01)):
+                    # print("Dim 1 check passed")
+                    if ((linkSpace[(axis + 1) % 3][0]+0.01 < dim2min < linkSpace[(axis + 1) % 3][1]-0.01) or 
+                        (linkSpace[(axis + 1) % 3][0]+0.01 < dim2max < linkSpace[(axis + 1) % 3][1]-0.01)) or ((linkSpace[(axis + 1) % 3][0]+0.01) > dim2min
+                        and dim2max > (linkSpace[(axis + 1) % 3][1]-0.01)):
+                        # print("Dim 2 check passed")
+                        if ((linkSpace[(axis + 2) % 3][0]+0.01 < dim3min < linkSpace[(axis + 2) % 3][1]-0.01) or 
+                            (linkSpace[(axis + 2) % 3][0]+0.01 < dim3max < linkSpace[(axis + 2) % 3][1]-0.01)) or ((linkSpace[(axis + 2) % 3][0]+0.01) > dim3min
+                            and dim3max > (linkSpace[(axis + 2) % 3][1]-0.01)):
+                            # print("No space")
 
-                                noSpaceFlag = True
-                                break
-                                # dimensionToChange = 0
-                                # if size[dimensionToChange] < 0.2:
-                                #     dimensionToChange = 1
-                                #     if size[dimensionToChange] < 0.2:
-                                #         dimensionToChange = 2
-                                #         if size[dimensionToChange] < 0.2:
-                                #             print('All dimensions small')
-                                #             noSpaceFlag = True
-                                #             break
-                                # size[dimensionToChange] -= 0.05
-                                # # print("Dimension: " + str(dimensionToChange) + "Size: " + str(size[dimensionToChange]))
-                                # if (dimensionToChange == abs(direction) - 1):
-                                #     pos[abs(direction) - 1] = size[abs(direction) - 1]/2 * (direction / abs(direction))
-                                # dim1min = self.lastAbsolutePos[self.nextLinkID][axis] + pos[axis] - abs(size[axis] / 2)
-                                # dim1max = self.lastAbsolutePos[self.nextLinkID][axis] + pos[axis] + abs(size[axis] / 2)
-                                # dim2min = self.lastAbsolutePos[self.nextLinkID][(axis + 1) % 3] + pos[(axis + 1) % 3] - abs(size[(axis + 1) % 3] / 2)
-                                # dim2max = self.lastAbsolutePos[self.nextLinkID][(axis + 1) % 3] + pos[(axis + 1) % 3] + abs(size[(axis + 1) % 3] / 2)
-                                # dim3min = self.lastAbsolutePos[self.nextLinkID][(axis + 2) % 3] + pos[(axis + 2) % 3] - abs(size[(axis + 2) % 3] / 2)
-                                # dim3max = self.lastAbsolutePos[self.nextLinkID][(axis + 2) % 3] + pos[(axis + 2) % 3] + abs(size[(axis + 2) % 3] / 2)
-                            else:
-                                break
+                            noSpaceFlag = True
+                            break
+                            # dimensionToChange = 0
+                            # if size[dimensionToChange] < 0.2:
+                            #     dimensionToChange = 1
+                            #     if size[dimensionToChange] < 0.2:
+                            #         dimensionToChange = 2
+                            #         if size[dimensionToChange] < 0.2:
+                            #             print('All dimensions small')
+                            #             noSpaceFlag = True
+                            #             break
+                            # size[dimensionToChange] -= 0.05
+                            # # print("Dimension: " + str(dimensionToChange) + "Size: " + str(size[dimensionToChange]))
+                            # if (dimensionToChange == abs(direction) - 1):
+                            #     pos[abs(direction) - 1] = size[abs(direction) - 1]/2 * (direction / abs(direction))
+                            # dim1min = self.lastAbsolutePos[self.nextLinkID][axis] + pos[axis] - abs(size[axis] / 2)
+                            # dim1max = self.lastAbsolutePos[self.nextLinkID][axis] + pos[axis] + abs(size[axis] / 2)
+                            # dim2min = self.lastAbsolutePos[self.nextLinkID][(axis + 1) % 3] + pos[(axis + 1) % 3] - abs(size[(axis + 1) % 3] / 2)
+                            # dim2max = self.lastAbsolutePos[self.nextLinkID][(axis + 1) % 3] + pos[(axis + 1) % 3] + abs(size[(axis + 1) % 3] / 2)
+                            # dim3min = self.lastAbsolutePos[self.nextLinkID][(axis + 2) % 3] + pos[(axis + 2) % 3] - abs(size[(axis + 2) % 3] / 2)
+                            # dim3max = self.lastAbsolutePos[self.nextLinkID][(axis + 2) % 3] + pos[(axis + 2) % 3] + abs(size[(axis + 2) % 3] / 2)
                         else:
                             break
+                    else:
+                        break
         return pos, size, noSpaceFlag
 
     # Creates a random link with id childID. Also creates a joint from parentID to childID.
