@@ -98,19 +98,19 @@ class SOLUTION:
         if mutationProbability < 0.1:
             self.numHiddenNeurons += 1
             for sensor in self.sensorWeights:
-                sensor.append(random.random() * 2 - 1)
+                self.sensorWeights[sensor].append(random.random() * 2 - 1)
 
             for motor in self.motorWeights:
-                motor.append(random.random() * 2 - 1)
+                self.motorWeights[motor].append(random.random() * 2 - 1)
 
         elif mutationProbability < 0.2:
             if self.numHiddenNeurons > 1:
                 self.numHiddenNeurons -= 1
                 for sensor in self.sensorWeights:
-                    sensor.pop(self.numHiddenNeurons)
+                    self.sensorWeights[sensor].pop(self.numHiddenNeurons)
 
                 for motor in self.motorWeights:
-                    motor.pop(self.numHiddenNeurons)
+                    self.motorWeights[motor].pop(self.numHiddenNeurons)
 
     def Mutate_Body(self):
         mutationProbability = random.random()
@@ -138,6 +138,15 @@ class SOLUTION:
         # 40% chance to change a link size
         else:
             self.Change_Link_Size()
+
+        # If there are no sensors after the mutation, make the root node a sensor
+        self.sensors = []
+        for link in self.linkPlan:
+            if link[4] == 'green':
+                self.sensors.append(link[0])
+
+        if len(self.sensors) == 0:
+            self.linkPlan[0][4] == 'green'
 
     def Switch_Sensor_Status(self, currentColor, newColor):
         swappableLinks = []
