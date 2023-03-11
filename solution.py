@@ -539,7 +539,7 @@ class SOLUTION:
                         break
         return pos, size, noSpaceFlag
 
-    # Creates a random link with id childID. Also creates a joint from parentID to childID.
+    # Creates links from a body plan
     def Create_Links(self):
         for link in self.linkPlan:
             pyrosim.Send_Cube(name=str(link[0]), pos=link[2], size=link[3], colorName = link[4])
@@ -574,7 +574,6 @@ class SOLUTION:
         for joint in self.jointPlan:
             pyrosim.Send_Motor_Neuron( name = self.jointPlan.index(joint) , jointName = str(joint[0]) + "_" + str(joint[1]))
 
-            # Will need to be changed if deleting links for evolution
             if self.jointPlan.index(joint) not in self.motorWeights:
                 self.motorWeights[self.jointPlan.index(joint)] = []
                 for i in range(0, self.numHiddenNeurons):

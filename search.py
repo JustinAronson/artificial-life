@@ -6,8 +6,6 @@ import random
 import constants as c
 import copy
 # pdb.set_trace()
-os.system("rm gen*")
-
 trials = []
 
 for runNumber in range(0, c.numTrials):
@@ -19,7 +17,7 @@ for runNumber in range(0, c.numTrials):
     # phc.Show_Best('gen' + str(runNumber))
     
     # opening the csv file in 'w+' mode
-    file = open('gen' + str(runNumber) + '.csv', 'w+', newline ='')
+    file = open('/run' + str(runNumber) + '/fitnessData.csv', 'w+', newline ='')
     
     # writing the data into the file
     with file:   

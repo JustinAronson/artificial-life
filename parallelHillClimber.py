@@ -21,11 +21,18 @@ class PARALLEL_HILL_CLIMBER:
         # print("Out HILL_CLIMBER")
         self.bestFitnessValues = []
 
-    def Evolve(self):
+    def Evolve(self, folderPath):
         self.Evaluate(self.parents)
         # self.parent.Evaluate("GUI")
         for currentGeneration in range(0, c.numberOfGenerations):
             self.Evolve_For_One_Generation()
+            if currentGeneration % 50 == 0:
+                lowestFitnessParent = self.Get_Best_Robot()
+                pickle.dump( lowestFitnessParent.linkPlan, open( folderPath + "Gen" + str(currentGeneration) + "linkPlan.p", "wb" ) )
+                pickle.dump( lowestFitnessParent.jointPlan, open( folderPath + "Gen" + str(currentGeneration) + "jointPlan.p", "wb" ) )
+                pickle.dump( lowestFitnessParent.sensorWeights, open( folderPath + "Gen" + str(currentGeneration) + "sensorWeights.p", "wb" ) )
+                pickle.dump( lowestFitnessParent.motorWeights, open( folderPath + "Gen" + str(currentGeneration) + "motorWeights.p", "wb" ) )
+                pickle.dump( lowestFitnessParent.numHiddenNeurons, open( folderPath + "Gen" + str(currentGeneration) + "hiddenNeurons.p", "wb" ) )
 
     def Evolve_For_One_Generation(self):
         self.Spawn()
@@ -63,17 +70,16 @@ class PARALLEL_HILL_CLIMBER:
             print('Child fitness: ' + str(self.children[id].fitness))
             print("")
 
-    def Show_Best(self, fileName):
+    def Get_Best_Robot(self):
         lowestFitnessParent = self.parents[0]
         for id in self.parents:
             if self.parents[id].fitness < lowestFitnessParent.fitness:
                 lowestFitnessParent = self.parents[id]
-        
-        pickle.dump( lowestFitnessParent.linkPlan, open( fileName + "linkPlan.p", "wb" ) )
-        pickle.dump( lowestFitnessParent.jointPlan, open( fileName + "jointPlan.p", "wb" ) )
-        pickle.dump( lowestFitnessParent.sensorWeights, open( fileName + "sensorWeights.p", "wb" ) )
-        pickle.dump( lowestFitnessParent.motorWeights, open( fileName + "motorWeights.p", "wb" ) )
-        
+
+        return lowestFitnessParent
+
+    def Show_Best(self):
+        lowestFitnessParent = self.Get_Best_Robot()
         lowestFitnessParent.Start_Simulation("GUI")
         lowestFitnessParent.Wait_For_Simulation_To_End()
 
