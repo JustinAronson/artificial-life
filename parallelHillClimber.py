@@ -25,7 +25,7 @@ class PARALLEL_HILL_CLIMBER:
         self.Evaluate(self.parents)
         # self.parent.Evaluate("GUI")
         for currentGeneration in range(0, c.numberOfGenerations):
-            self.Evolve_For_One_Generation()
+            self.Evolve_For_One_Generation(currentGeneration)
             if currentGeneration % c.gensPerPickle == 0:
                 lowestFitnessParent = self.Get_Best_Robot()
                 pickle.dump( lowestFitnessParent.linkPlan, open( folderPath + "Gen" + str(currentGeneration) + "linkPlan.p", "wb" ) )
@@ -34,9 +34,9 @@ class PARALLEL_HILL_CLIMBER:
                 pickle.dump( lowestFitnessParent.motorWeights, open( folderPath + "Gen" + str(currentGeneration) + "motorWeights.p", "wb" ) )
                 pickle.dump( lowestFitnessParent.numHiddenNeurons, open( folderPath + "Gen" + str(currentGeneration) + "hiddenNeurons.p", "wb" ) )
 
-    def Evolve_For_One_Generation(self):
+    def Evolve_For_One_Generation(self, generation):
         self.Spawn()
-        self.Mutate()
+        self.Mutate(generation)
         self.Evaluate(self.children)
         # self.Print()
         self.Select()
@@ -48,9 +48,9 @@ class PARALLEL_HILL_CLIMBER:
             self.children[id].Set_ID(self.nextAvailableID)
             self.nextAvailableID += 1
 
-    def Mutate(self):
+    def Mutate(self, generation):
         for id in self.children:
-            self.children[id].Mutate()
+            self.children[id].Mutate(generation)
 
     def Select(self):
         minFitness = 10000

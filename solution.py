@@ -77,11 +77,13 @@ class SOLUTION:
         f.close()
         os.system("rm fitness" + str(self.myID) + ".txt")        
 
-    def Mutate(self):
+    def Mutate(self, generation):
         # print("Sensors: ")
         # print(self.sensors)
 
-        if random.random() < 0.3:
+        generationFraction = (c.numberOfGenerations - (0.004*generation + 0.000001*(generation**2) + 0.000008*(generation**3))) / c.numberOfGenerations
+
+        if random.random() < 0.6*generationFraction:
             self.Mutate_Body()
         else:
             self.Mutate_Brain()

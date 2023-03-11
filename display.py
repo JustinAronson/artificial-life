@@ -11,6 +11,10 @@ import math
 os.system("rm brain*.nndf")
 os.system("rm body*.urdf")
 
+#Enter the run number and generation you want to see:
+runNumber = 0
+generation = 0
+
 def Create_Body(linkPlan, jointPlan, sensorWeights, motorWeights):
     pyrosim.Start_URDF("body0.urdf")
             
@@ -66,8 +70,6 @@ def Create_Brain(linkPlan, jointPlan, sensorWeights, motorWeights):
 
     pyrosim.End()
 
-runNumber = 0
-generation = 2
 folderPath = '/Users/justin/Documents/CS Classes/artificial-life/run' + str(runNumber) + '/'
 
 linkPlan = pickle.load( open( folderPath + "Gen" + str(generation) + "linkPlan.p", "rb" ) )
