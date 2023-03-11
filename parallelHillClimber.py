@@ -26,7 +26,7 @@ class PARALLEL_HILL_CLIMBER:
         # self.parent.Evaluate("GUI")
         for currentGeneration in range(0, c.numberOfGenerations):
             self.Evolve_For_One_Generation()
-            if currentGeneration % 50 == 0:
+            if currentGeneration % c.gensPerPickle == 0:
                 lowestFitnessParent = self.Get_Best_Robot()
                 pickle.dump( lowestFitnessParent.linkPlan, open( folderPath + "Gen" + str(currentGeneration) + "linkPlan.p", "wb" ) )
                 pickle.dump( lowestFitnessParent.jointPlan, open( folderPath + "Gen" + str(currentGeneration) + "jointPlan.p", "wb" ) )

@@ -13,11 +13,14 @@ for runNumber in range(0, c.numTrials):
     phc = PARALLEL_HILL_CLIMBER()
     # phc.parents[0].Start_Simulation("GUI")
 
-    phc.Evolve()
+    folderPath = '/Users/justin/Documents/CS Classes/artificial-life/run' + str(runNumber) + '/'
+    os.makedirs(os.path.dirname(folderPath), exist_ok=True)
+
+    phc.Evolve(folderPath)
     # phc.Show_Best('gen' + str(runNumber))
     
     # opening the csv file in 'w+' mode
-    file = open('/run' + str(runNumber) + '/fitnessData.csv', 'w+', newline ='')
+    file = open(folderPath + 'fitnessData.csv', 'w+', newline ='')
     
     # writing the data into the file
     with file:   
@@ -31,4 +34,4 @@ for runNumber in range(0, c.numTrials):
 input('Press Enter to continue:')
 
 for phc in trials:
-    phc.Show_Best('gen' + str(trials.index(phc)))
+    phc.Show_Best()

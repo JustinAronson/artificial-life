@@ -7,11 +7,11 @@ amplitudeFront = numpy.pi/4
 frequencyFront = 6
 phaseOffsetFront = numpy.pi/4
 
-loopIterations = 800
+loopIterations = 10000
 
-numberOfGenerations = 50
-populationSize = 50
-numTrials = 5
+numberOfGenerations = 3
+populationSize = 1
+numTrials = 1
 
 numSensorNeurons = 4
 numMotorNeurons = 8
@@ -21,3 +21,5 @@ motorJointRange = 0.4
 
 minLinks = 4
 maxDepth = 4
+
+gensPerPickle = 2

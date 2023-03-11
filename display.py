@@ -8,19 +8,11 @@ import os
 import time
 import math
 
-folderPath = "/run/"
-generation = 0
+os.system("rm brain*.nndf")
+os.system("rm body*.urdf")
 
-linkPlan = pickle.load( open( folderPath + "Gen" + str(generation) + "linkPlan.p", "wb" ) )
-jointPlan = pickle.load( open( folderPath + "Gen" + str(generation) + "jointPlan.p", "wb" ) )
-sensorWeights = pickle.load( open( folderPath + "Gen" + str(generation) + "sensorWeights.p", "wb" ) )
-motorWeights = pickle.load( open( folderPath + "Gen" + str(generation) + "motorWeights.p", "wb" ) )
-# numHiddenNeurons = pickle.load( open( folderPath + "Gen" + str(generation) + "hiddenNeurons.p", "wb" ) )
-
-numHiddenNeurons = len(sensorWeights[0])
-
-def Create_Body():
-    pyrosim.Start_URDF("body.urdf")
+def Create_Body(linkPlan, jointPlan, sensorWeights, motorWeights):
+    pyrosim.Start_URDF("body0.urdf")
             
     Create_Links()
 
@@ -32,9 +24,8 @@ def Create_Links():
     for joint in jointPlan:
         pyrosim.Send_Joint(name = str(joint[0]) + "_" + str(joint[1]) , parent= str(joint[0]) , child = str(joint[1]) , type = "revolute", position = joint[2], jointAxis = "1 1 0")
 
-
-def Create_Brain():
-    pyrosim.Start_NeuralNetwork("brain.nndf")
+def Create_Brain(linkPlan, jointPlan, sensorWeights, motorWeights):
+    pyrosim.Start_NeuralNetwork("brain0.nndf")
 
     sensorIndex = 0
     sensors = []
@@ -74,3 +65,20 @@ def Create_Brain():
         pyrosim.Send_Hidden_Neuron(name = len(jointPlan) + hiddenNeuronID)
 
     pyrosim.End()
+
+runNumber = 0
+generation = 2
+folderPath = '/Users/justin/Documents/CS Classes/artificial-life/run' + str(runNumber) + '/'
+
+linkPlan = pickle.load( open( folderPath + "Gen" + str(generation) + "linkPlan.p", "rb" ) )
+jointPlan = pickle.load( open( folderPath + "Gen" + str(generation) + "jointPlan.p", "rb" ) )
+sensorWeights = pickle.load( open( folderPath + "Gen" + str(generation) + "sensorWeights.p", "rb" ) )
+motorWeights = pickle.load( open( folderPath + "Gen" + str(generation) + "motorWeights.p", "rb" ) )
+# numHiddenNeurons = pickle.load( open( folderPath + "Gen" + str(generation) + "hiddenNeurons.p", "wb" ) )
+
+numHiddenNeurons = len(sensorWeights[0])
+
+Create_Body(linkPlan, jointPlan, sensorWeights, motorWeights)
+Create_Brain(linkPlan, jointPlan, sensorWeights, motorWeights)
+
+os.system("python3 simulate.py " + "GUI" + " " + str(0) + " 2&>1 &")
