@@ -12,17 +12,23 @@ os.system("rm brain*.nndf")
 os.system("rm body*.urdf")
 
 #Enter the run number and generation you want to see:
-runNumber = 4
-generation = 200
+runNumber = 10
+generation = 9
 
 def Create_Body(linkPlan, jointPlan, sensorWeights, motorWeights):
     pyrosim.Start_URDF("body0.urdf")
             
-    Create_Links()
+    Create_Links(linkPlan, jointPlan)
 
     pyrosim.End()
 
-def Create_Links():
+    # pyrosim.Start_URDF("body.urdf")
+            
+    # Create_Links(linkPlan, jointPlan)
+
+    # pyrosim.End()
+
+def Create_Links(linkPlan, jointPlan):
     for link in linkPlan:
         pyrosim.Send_Cube(name=str(link[0]), pos=link[2], size=link[3], colorName = link[4])
     for joint in jointPlan:
@@ -73,6 +79,7 @@ def Create_Brain(linkPlan, jointPlan, sensorWeights, motorWeights):
 folderPath = '/Users/justin/Documents/CS Classes/artificial-life/run' + str(runNumber) + '/'
 
 linkPlan = pickle.load( open( folderPath + "Gen" + str(generation) + "linkPlan.p", "rb" ) )
+print(linkPlan[0])
 jointPlan = pickle.load( open( folderPath + "Gen" + str(generation) + "jointPlan.p", "rb" ) )
 sensorWeights = pickle.load( open( folderPath + "Gen" + str(generation) + "sensorWeights.p", "rb" ) )
 motorWeights = pickle.load( open( folderPath + "Gen" + str(generation) + "motorWeights.p", "rb" ) )

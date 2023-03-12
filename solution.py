@@ -362,7 +362,7 @@ class SOLUTION:
 
     def Create_Body_Plan(self):
         size = [x / 10 for x in random.sample(range(1, 20), 3)]
-        pos = [0, 0, 1]
+        pos = [0, 0, 5.5]
 
         self.sensorIDs = []
 
@@ -468,7 +468,7 @@ class SOLUTION:
 
         jointPos = [0, 0, 0]
         if parentID == 0:
-            jointPos[2] = 1
+            jointPos[2] = 5.5
             jointPos[abs(direction) - 1] += self.linkPlan[0][3][abs(direction) - 1] / 2 * (direction / abs(direction))
         else:
             jointPos[abs(prevDirection) - 1] = prevSize[abs(prevDirection) - 1] / 2 * (prevDirection / abs(prevDirection))
