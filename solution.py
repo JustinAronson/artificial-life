@@ -197,6 +197,7 @@ class SOLUTION:
 
         # If there are no links without children, return (should never happen)
         if len(linksWithoutChildren) == 0:
+            print("No links without children")
             return
 
         # parent = []
