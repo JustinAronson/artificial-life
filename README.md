@@ -72,7 +72,7 @@ If Bob mutated his link 1 to again become a sensing link, his body plan would re
 
 This mutation has a 60% chance to add a single link, a 30% chance to add two links, and a 10% chance to add three links to the creature. It adds links to any open face of the creature. The open face does not need to be at the end of a branch. All added links follow the rules of body generation, with the exception of the following rule: Links are not added past the max depth of the robot. Mutated links are able to be added beyond the depth specified in constants.py.
 
-Here is Bob after undergoing an add links mutation:![IMG_0904](https://user-images.githubusercontent.com/11809261/225108605-94c0d6ce-f8a0-4e63-b622-88c4f61ff350.PNG)
+Here is Bob after undergoing an add links mutation:![IMG_0904](https://user-images.githubusercontent.com/11809261/225110367-9e0fbd73-9d86-4cc7-b021-c835a5b5e72b.PNG)
 ### Remove link
           
 This mutation removes a single random link from the creature. Removed links are always at the end of a branch.
