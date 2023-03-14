@@ -13,7 +13,7 @@ os.system("rm body*.urdf")
 
 #Enter the run number and generation you want to see:
 runNumber = 10
-generation = 9
+generation = 50
 
 def Create_Body(linkPlan, jointPlan, sensorWeights, motorWeights):
     pyrosim.Start_URDF("body0.urdf")
