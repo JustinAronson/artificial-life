@@ -283,7 +283,7 @@ class SOLUTION:
         if linkToChange[0] != 0:
             pos[abs(linkToChange[6]) - 1] = size[abs(linkToChange[6]) - 1]/2 * (linkToChange[6] / abs(linkToChange[6]))
         else:
-            pos = [0, 0, 7.5]
+            pos = [0, 0, 5.1]
 
         linkToChange[2] = pos
         linkToChange[3] = size
@@ -291,7 +291,7 @@ class SOLUTION:
         for child in directChildren:
             jointPos = [0, 0, 0]
             if linkToChange[0] == 0:
-                jointPos[2] = 7.5
+                jointPos[2] = 5.1
                 jointPos[abs(child[6]) - 1] += self.linkPlan[0][3][abs(child[6]) - 1] / 2 * (child[6] / abs(child[6]))
             else:
                 jointPos[abs(linkToChange[6]) - 1] = size[abs(linkToChange[6]) - 1] / 2 * (linkToChange[6] / abs(linkToChange[6]))
@@ -368,7 +368,7 @@ class SOLUTION:
 
     def Create_Body_Plan(self):
         size = [x / 10 for x in random.sample(range(1, 20), 3)]
-        pos = [0, 0, 7.5]
+        pos = [0, 0, 5.1]
 
         self.sensorIDs = []
 
@@ -474,7 +474,7 @@ class SOLUTION:
 
         jointPos = [0, 0, 0]
         if parentID == 0:
-            jointPos[2] = 7.5
+            jointPos[2] = 5.1
             jointPos[abs(direction) - 1] += self.linkPlan[0][3][abs(direction) - 1] / 2 * (direction / abs(direction))
         else:
             jointPos[abs(prevDirection) - 1] = prevSize[abs(prevDirection) - 1] / 2 * (prevDirection / abs(prevDirection))
