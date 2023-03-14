@@ -81,6 +81,7 @@ folderPath = '/Users/justin/Documents/CS Classes/artificial-life/run' + str(runN
 linkPlan = pickle.load( open( folderPath + "Gen" + str(generation) + "linkPlan.p", "rb" ) )
 print(linkPlan[0])
 jointPlan = pickle.load( open( folderPath + "Gen" + str(generation) + "jointPlan.p", "rb" ) )
+print(jointPlan[0])
 sensorWeights = pickle.load( open( folderPath + "Gen" + str(generation) + "sensorWeights.p", "rb" ) )
 motorWeights = pickle.load( open( folderPath + "Gen" + str(generation) + "motorWeights.p", "rb" ) )
 # numHiddenNeurons = pickle.load( open( folderPath + "Gen" + str(generation) + "hiddenNeurons.p", "wb" ) )

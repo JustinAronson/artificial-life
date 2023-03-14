@@ -291,7 +291,7 @@ class SOLUTION:
         for child in directChildren:
             jointPos = [0, 0, 0]
             if linkToChange[0] == 0:
-                jointPos[2] = 1
+                jointPos[2] = 7.5
                 jointPos[abs(child[6]) - 1] += self.linkPlan[0][3][abs(child[6]) - 1] / 2 * (child[6] / abs(child[6]))
             else:
                 jointPos[abs(linkToChange[6]) - 1] = size[abs(linkToChange[6]) - 1] / 2 * (linkToChange[6] / abs(linkToChange[6]))
