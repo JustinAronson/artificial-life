@@ -35,7 +35,11 @@ We will be refering to this robot in the future. Let's call it Bob.
 Links can be generated in any direction except for the negative z direction, and bodies are thus able to fill 3D space. Links do not intersect upon generation, although with joint motion they may intersect each other.
 
 # Evolution
-After each generation was simulated, either the brain or body of the robot was mutated. One of the two was mutated at each generation, and both were never mutated in the same generation.
+After each generation was simulated, either the brain or body of the robot was mutated. One of the two was mutated at each generation, and both were never mutated in the same generation. The body was mutated with the following probability, based on generation.
+
+<img width="753" alt="Screen Shot 2023-03-14 at 10 07 18 PM" src="https://user-images.githubusercontent.com/11809261/225195155-a2a1ad22-77db-4a59-a382-7bf86e5cb57e.png">
+
+As you can see, the bodies were mutated with about a 60% chance until the 200th generation. The chance that the body mutates falls until generation 400, where the body can no longer mutate. The brain mutates with probability (1-body mutation probability).
 
 # Brain Evolution
 When the brain mutated, the weight of one of the synapses sending information from a sensor neuron to a hidden neuron was randomized, as well as the weight of one of the synapses sending information from a hidden neuron to a motor neuron. Additionally, there was a 10% chance that a hidden neuron would be either deleted or gained each time the brain mutated. This hidden neuron would be connected to all sensor neurons and motor neurons. The following diagram demonstrates the connections lost when Bob loses a hidden neuron: 
@@ -84,7 +88,7 @@ This mutation changes a random link's size in the creature. The relative positio
 If Bob were to undergo a change link size mutation: ![IMG_0905](https://user-images.githubusercontent.com/11809261/225108964-9aae1c0f-4b4f-450d-b74d-018816b387a1.PNG)
 
 # Simulation Overview
-The simulation submitted for Assignment 8 used the constants found in constants.py. The runs for seeds (1, 2, 3, 4, and 5) in the graph below can be repeated by running search.py. Other runs can be tested by changing the value used by ``` random.seed() ``` in search.py. 
+The simulation submitted for the Final Project used the constants found in constants.py. The runs for seeds (20, 21, ... 28, 29) in the graph below can be repeated by running search.py. Other runs can be tested by changing the value used by ``` random.seed() ``` in search.py. 
 
 The fitness of a robot was determined by the robot's Euclidean distance to the point -100, -100. A smaller distance was prefered. If the blue cube is a robot, its goal is to approach the yellow square:
 ![IMG_0909](https://user-images.githubusercontent.com/11809261/225109812-2ff7d8dd-73ff-4c8c-9481-416c424e44f9.PNG)
@@ -97,9 +101,11 @@ The purple cube ended the simulation closer to the yellow goal than the blue cub
 ![IMG_0912](https://user-images.githubusercontent.com/11809261/225109901-099c0e84-74f8-4665-aac7-6b37ef15b8b0.PNG)
 
 ## Fitness Values at each Generation
-The following graph contains the best fitness value at each generation for 5 robots over 50 generations, with a population size of 50. A smaller fitness value was preferred. ![Graph](https://github.com/JustinAronson/artificial-life/blob/3d-creatures/Screen%20Shot%202023-02-28%20at%2012.11.16%20AM.png)
+The following graph contains the best fitness value at each generation for 10 robots over 500 generations, with a population size of 10. A smaller fitness value was preferred. <img width="674" alt="Screen Shot 2023-03-14 at 9 51 32 PM" src="https://user-images.githubusercontent.com/11809261/225192917-91e7d441-76e2-4601-957c-7c0dad1998ec.png">
 
-A popular strategy used by robots in this simulation was building tall robots which fell over in the (-x, -y) direction. Future fitness functions will test for robot movement after a certain time step to make this strategy more difficult.
+As evident from the graph, the rate of improvement starts out very steep, with robots improving almost every generation. As the robots become better and better, the improvement per generation becomes smaller and the generations which do improve become more sparse. This is typical of evolution - when robots have a very poor fitness, any change is somewhat likely to be beneficial. As the robots' become more and more fit, large changes become more likely to be harmful, because the robot is already nearing a local optimum in terms of fitness. However, this form of evolution only excels at finding local optima. These robots may not, and in fact are clearly not, the optimal solution to reach the point -100, -100. More optimal robots could be found by increasing genetic diversity in the robots early on. This can be accomplished by using evolutionary algorithms other than the parallel hill climber.
+
+Another reason for this dropoff is the brain-body mutation algorithm. The algorithm mutates the body more often early in the evolutionary process, and gradually becomes less likely to mutate the body and more likely to mutate the brain. This reduces the diversity of the population but allows for optimizing the body type the robot found by the middle generations. The thought process behind this choice was that by the middle generations, the robots are already approaching a local optimum. Doing large changes on the robot, such as changing its body, would be more likely to harm the robot's fitness than help. Thus, we make small changes towards the end of the algorithm.
 
 # Citations
 Code for this reposity is based on the following:
