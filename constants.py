@@ -7,11 +7,11 @@ amplitudeFront = numpy.pi/4
 frequencyFront = 6
 phaseOffsetFront = numpy.pi/4
 
-loopIterations = 6000
+loopIterations = 3000
 
-numberOfGenerations = 51
-populationSize = 1
-numTrials = 1
+numberOfGenerations = 501
+populationSize = 10
+numTrials = 9
 
 numSensorNeurons = 4
 numMotorNeurons = 8

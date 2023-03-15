@@ -8,7 +8,7 @@ import copy
 # pdb.set_trace()
 trials = []
 
-for runNumber in range(10, c.numTrials+10):
+for runNumber in range(21, c.numTrials+21):
     random.seed(runNumber)
     phc = PARALLEL_HILL_CLIMBER()
     # phc.parents[0].Start_Simulation("GUI")

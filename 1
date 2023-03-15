@@ -1,5 +1,6 @@
 pybullet build time: Jan  9 2023 15:21:07
 Going into Sim Run
+Out Sim Run
 Version = 4.1 Metal - 76.3
 Vendor = Apple
 Renderer = Apple M2
@@ -19,19 +20,3 @@ destroy semaphore
 semaphore destroyed
 destroy main semaphore
 main semaphore destroyed
-Traceback (most recent call last):
-  File "/Users/justin/Documents/CS Classes/artificial-life/simulate.py", line 20, in <module>
-    simulation.Run()
-  File "/Users/justin/Documents/CS Classes/artificial-life/simulation.py", line 37, in Run
-    self.robot.Sense(t)
-  File "/Users/justin/Documents/CS Classes/artificial-life/robot.py", line 31, in Sense
-    self.sensors[sensor].Get_Value(t)
-  File "/Users/justin/Documents/CS Classes/artificial-life/sensor.py", line 12, in Get_Value
-    self.values[t] = pyrosim.Get_Touch_Sensor_Value_For_Link(self.linkName)
-  File "/Users/justin/Documents/CS Classes/artificial-life/pyrosim/pyrosim.py", line 53, in Get_Touch_Sensor_Value_For_Link
-    pts = p.getContactPoints()
-pybullet.error: Not connected to physics server.
-Exception ignored in: <function SIMULATION.__del__ at 0x103b2bb80>
-Traceback (most recent call last):
-  File "/Users/justin/Documents/CS Classes/artificial-life/simulation.py", line 28, in __del__
-pybullet.error: Not connected to physics server.
