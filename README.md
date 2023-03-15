@@ -2,6 +2,11 @@
 
 This repository contains my submission for CS 396 Artificial Life. This repository is based on the [ludobots](https://www.reddit.com/r/ludobots/) course.
 
+A 2 minute video describing evolution in the context of this repository can be found [here](https://www.youtube.com/watch?v=aeARA5lq__Y) - note the last 22 seconds are b-roll and can be skipped (though I think its pretty cool).
+
+10 GIF of the evolved robots:
+![Final Project GIF](https://user-images.githubusercontent.com/11809261/225199033-4887a745-586e-4cea-96ab-126c04642f61.gif)
+
 # System Dependencies
 
 This repository is configured for a Mac machine running macOS. Machines running other operating systems will need to edit various os commands. Visit [ludobots](https://www.reddit.com/r/ludobots/) for machine specific instructions.
@@ -21,6 +26,7 @@ After a short wait, the simulation should appear in a separate window.
 Simulation specific variables, such as the number of links in the snake, the range that the joints can move in, and the number of generations that evolve are determined in the file constants.py, located in the main folder. Feel free to change these.
 
 # Brain and Body Generation
+
 Links are generated in a tree format. Links are placed on open faces of links: ![Links on open faces](https://user-images.githubusercontent.com/11809261/225104341-504f90e6-11d8-4be0-a486-9194c57af45b.PNG)
 
 Links are placed until they reach a certain depth, specified in constants.py, from the root node. In this example, depth is 3. Links can be added to links with depth 0, 1, and 2, but no links can be added to a face of a link with depth 3. ![Depth](https://user-images.githubusercontent.com/11809261/225104761-98a6083d-a4dd-46f7-b9e1-86f491608ff2.PNG)
@@ -102,6 +108,7 @@ The purple cube ended the simulation closer to the yellow goal than the blue cub
 
 ## Fitness Values at each Generation
 The following graph contains the best fitness value at each generation for 10 robots over 500 generations, with a population size of 10. A smaller fitness value was preferred. 
+
 <img width="674" alt="Screen Shot 2023-03-14 at 9 51 32 PM" src="https://user-images.githubusercontent.com/11809261/225192917-91e7d441-76e2-4601-957c-7c0dad1998ec.png">
 
 As evident from the graph, the rate of improvement starts out very steep, with robots improving almost every generation. As the robots become better and better, the improvement per generation becomes smaller and the generations which do improve become more sparse. This is typical of evolution - when robots have a very poor fitness, any change is somewhat likely to be beneficial. As the robots' become more and more fit, large changes become more likely to be harmful, because the robot is already nearing a local optimum in terms of fitness. However, this form of evolution only excels at finding local optima. These robots may not, and in fact are clearly not, the optimal solution to reach the point -100, -100. More optimal robots could be found by increasing genetic diversity in the robots early on. This can be accomplished by using evolutionary algorithms other than the parallel hill climber.
