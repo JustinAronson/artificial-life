@@ -4,7 +4,8 @@ This repository contains my submission for CS 396 Artificial Life. This reposito
 
 A 2 minute video describing evolution in the context of this repository can be found [here](https://www.youtube.com/watch?v=aeARA5lq__Y) - note the last 22 seconds are b-roll and can be skipped (though I think its pretty cool).
 
-10 GIF of the evolved robots:
+10 second GIF of the evolved robots:
+
 ![Final Project GIF](https://user-images.githubusercontent.com/11809261/225199033-4887a745-586e-4cea-96ab-126c04642f61.gif)
 
 # System Dependencies
