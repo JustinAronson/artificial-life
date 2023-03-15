@@ -155,3 +155,5 @@ Code for this reposity is based on the following:
 [pybullet](https://pybullet.org/wordpress/)
 
 [pyrosim](https://github.com/ccappelle/pyrosim)
+
+This project was heavily inspired by [Karl Sims' work](https://dl.acm.org/doi/10.1145/192161.192167) with simulating life.
