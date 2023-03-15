@@ -12,7 +12,7 @@ os.system("rm brain*.nndf")
 os.system("rm body*.urdf")
 
 #Enter the run number and generation you want to see:
-runNumber = 20
+runNumber = 29
 generation = 500
 
 def Create_Body(linkPlan, jointPlan, sensorWeights, motorWeights):
@@ -85,8 +85,12 @@ print(jointPlan[0])
 sensorWeights = pickle.load( open( folderPath + "Gen" + str(generation) + "sensorWeights.p", "rb" ) )
 motorWeights = pickle.load( open( folderPath + "Gen" + str(generation) + "motorWeights.p", "rb" ) )
 # numHiddenNeurons = pickle.load( open( folderPath + "Gen" + str(generation) + "hiddenNeurons.p", "wb" ) )
-
-numHiddenNeurons = len(sensorWeights[0])
+print(sensorWeights)
+firstSensor = 0
+for link in linkPlan:
+    if link[4] == 'green':
+        firstSensor = link[0]
+numHiddenNeurons = len(sensorWeights[firstSensor])
 
 Create_Body(linkPlan, jointPlan, sensorWeights, motorWeights)
 Create_Brain(linkPlan, jointPlan, sensorWeights, motorWeights)
