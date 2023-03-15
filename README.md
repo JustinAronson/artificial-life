@@ -15,17 +15,21 @@ This repository is configured for a Mac machine running macOS. Machines running 
 # Run and Installation Instructions
 This repository requires [Python 3](https://www.python.org/downloads/). 
 
-To run the simulation, first copy the entire repository from github. 
+To run the simulation, first copy the entire repository from github. Simulation specific variables, such as the number of links in the snake and the range that the joints can move in are determined in the file constants.py, located in the main folder. Feel free to change these.
 
 Navigate to the snakes branch, and run the command
 ```bash 
 python3 search.py
 ```
 
+This will run the evolutionary algorithm. It takes a long time, so be prepared to have it running for a while or change the number of generations, the population size, or the number of trials in constants.py to make the process faster. After the simulations are finished, a prompt will appear. Press the Enter key to view the best robots from each trial.
+
+After running a number of simulations, robot data is stored in pickled files. Update display.py to the run number you wish to display and the generation of that run, and run the command
+```bash
+python3 display.py
+```
+
 After a short wait, the simulation should appear in a separate window.
-
-Simulation specific variables, such as the number of links in the snake, the range that the joints can move in, and the number of generations that evolve are determined in the file constants.py, located in the main folder. Feel free to change these.
-
 # Brain and Body Generation
 
 Links are generated in a tree format. Links are placed on open faces of links: ![Links on open faces](https://user-images.githubusercontent.com/11809261/225104341-504f90e6-11d8-4be0-a486-9194c57af45b.PNG)
