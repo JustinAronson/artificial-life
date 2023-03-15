@@ -118,6 +118,27 @@ Another reason for this dropoff is the brain-body mutation algorithm. The algori
 
 Interestingly, the deviation of robot fitnesses was greater at the end of the algorithm than at the beginning. This is likely due to the robots each finding different local optima. At the start, all the robots could not move very far. Their fitness values are all close to 135, which is almost equal to 141, the euclidean distance from the origin to the point (-100, -100). The robots likely flailed around near the origin, which moved their centers a few  units in the (-1, -1) direction at some point during the simulation. As such, they are all equally bad. However, as they start to move they become fixed on a certain local optimum. Since the parallel hill climber algorithm does not let robots survive if they do even slightly worse than their parent, it is very difficult for a mutation to be beneficial enough to find a different local optima and put the robot on a different evolutionary path. Thus, they will become as good as their local optima "allows" them to be. This can cause robots to have vastly different fitness values at the end of the algorithm.
 
+The video listed at the start of this readme demonstrates how one lineage, run 20, evolved over the 500 generation span. The most visible changes in run 20 happen between generations 0 and 200. 
+
+<img width="194" alt="Screen Shot 2023-03-14 at 10 44 32 PM" src="https://user-images.githubusercontent.com/11809261/225200854-3abaddb4-35ad-486a-9189-63bb16645f96.png">
+Run 20 at generation 0.
+
+<img width="259" alt="Screen Shot 2023-03-14 at 10 43 35 PM" src="https://user-images.githubusercontent.com/11809261/225200700-bfb8e9b5-4d29-4d1d-9624-dbaa6a0ee80d.png">
+Run 20 at generation 100.
+
+<img width="184" alt="Screen Shot 2023-03-14 at 10 45 30 PM" src="https://user-images.githubusercontent.com/11809261/225200994-5435bd13-1dbf-4456-a0fd-e3207c775906.png">
+Run 20 at generation 200.
+
+Interestingly, this robot almost completely stops improving after generation 300. In fact, the fitness value at generation 500 only improves upon the fitness value at generation 350 by 0.35. 
+
+<img width="406" alt="Screen Shot 2023-03-14 at 7 51 40 PM" src="https://user-images.githubusercontent.com/11809261/225200529-935fe06d-2e0c-462d-
+8d7d-2061f8c38969.png">
+Run 20 at generation 350. Same body as generation 500.
+
+I believe that this is because run 20's most optimal form has only four links. There is not much to optimize in the brain of a body with only four links and one sensor, since there is not much complexity and it is not capable of many movement patterns.
+
+It is slightly difficult to track the evolution of a single lineage because of the multiple parallel simulations running at the same time. The pickling program takes the most fit robot at the 50th generation. However, it does not document each of the 10 robot populations. Thus, at generation 50 the robot from population a might be pickled, but at generation 100 the robot from population b is pickled. We now have no way of knowing what population a looked like at 100 generations. If I were to run this again, I would add the ability to pickle a robot from each population.
+
 # Citations
 Code for this reposity is based on the following:
 
